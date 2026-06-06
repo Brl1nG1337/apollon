@@ -26,7 +26,7 @@ class _AppWrapperState extends State<ApollonAppWrapper> {
               image: AssetImage("assets/images/Apollon Background.png"),
               fit: BoxFit.cover
           ),
-          borderRadius: BorderRadius.circular(20)
+          borderRadius: BorderRadius.circular(50)
         ),
       ),
     );
