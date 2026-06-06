@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -6,19 +9,12 @@ import 'app/apollon_dashboard.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await windowManager.ensureInitialized();
-
-  const options = WindowOptions(
-    fullScreen: true,
-  );
-
-  await windowManager.waitUntilReadyToShow(
-    options,
-        () async {
-      await windowManager.show();
-      await windowManager.focus();
-    },
-  );
+  if (!kIsWeb &&
+      (Platform.isLinux ||
+          Platform.isWindows ||
+          Platform.isMacOS)) {
+    await windowManager.ensureInitialized();
+  }
 
   runApp(const ApollonApplication());
 }

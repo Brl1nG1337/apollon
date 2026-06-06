@@ -1,6 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 
 class ApollonDashboard extends StatefulWidget {
   const ApollonDashboard({super.key});
@@ -10,7 +9,6 @@ class ApollonDashboard extends StatefulWidget {
 }
 
 class _AppWrapperState extends State<ApollonDashboard> {
-
   @override
   Widget build(BuildContext context) {
     var colors = Theme.of(context).colorScheme;
@@ -22,10 +20,15 @@ class _AppWrapperState extends State<ApollonDashboard> {
         height: 480,
         decoration: BoxDecoration(
           image: DecorationImage(
-              image: AssetImage("assets/images/Apollon Background.png"),
-              fit: BoxFit.cover
+            image: AssetImage("assets/images/Apollon Background.png"),
+            fit: BoxFit.cover,
           ),
-          borderRadius: BorderRadius.circular(50)
+          borderRadius: BorderRadius.circular(50),
+        ),
+        child: Column(
+          children: [
+            Row(children: [Text("apollon")]),
+          ],
         ),
       ),
     );
