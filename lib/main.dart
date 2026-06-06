@@ -3,16 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   await windowManager.ensureInitialized();
 
+  const options = WindowOptions(
+    fullScreen: true,
+  );
+
   await windowManager.waitUntilReadyToShow(
-    const WindowOptions(
-      fullScreen: true,
-    ),
+    options,
         () async {
-      await windowManager.setFullScreen(true);
+      await windowManager.show();
+      await windowManager.focus();
     },
   );
+
   runApp(const ApollonApplication());
 }
 
