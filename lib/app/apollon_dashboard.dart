@@ -2,19 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 
-class ApollonAppWrapper extends StatefulWidget {
-  const ApollonAppWrapper({super.key});
+class ApollonDashboard extends StatefulWidget {
+  const ApollonDashboard({super.key});
 
   @override
-  State<ApollonAppWrapper> createState() => _AppWrapperState();
+  State<ApollonDashboard> createState() => _AppWrapperState();
 }
 
-class _AppWrapperState extends State<ApollonAppWrapper> {
+class _AppWrapperState extends State<ApollonDashboard> {
 
   @override
   Widget build(BuildContext context) {
     var colors = Theme.of(context).colorScheme;
-
 
     return Scaffold(
       backgroundColor: Colors.black,
