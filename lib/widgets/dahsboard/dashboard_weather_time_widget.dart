@@ -74,19 +74,23 @@ class _DashboardWeatherTimeWidgetState
             alignment: AlignmentGeometry.bottomRight,
             child: Lottie.asset(
               _currentLottieAsset,
-              height: 200,
+              height: 164,
               repeat: true,
               animate: true,
             ),
           ),
           Align(
             alignment: AlignmentGeometry.bottomLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 24, bottom: 24),
-              child: Text(
-                _formatTime(DateTime.now()),
-                style: GoogleFonts.audiowide(fontSize: 72),
-              ),
+            child: Text(
+              _formatTime(_currentTime),
+              style: GoogleFonts.audiowide(fontSize: 88, letterSpacing: -5),
+            ),
+          ),
+          Align(
+            alignment: AlignmentGeometry.topLeft,
+            child: Text(
+              "Sonntag, 7. Juli 2026",
+              style: GoogleFonts.audiowide(fontSize: 32, letterSpacing: -2),
             ),
           ),
         ],

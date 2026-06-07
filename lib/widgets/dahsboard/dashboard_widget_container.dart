@@ -22,9 +22,10 @@ class _DashboardWidgetContainerState extends State<DashboardWidgetContainer> {
     var colors = Theme.of(context).colorScheme;
     return Container(
       margin: EdgeInsets.all(24),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: colors.primary.withAlpha(35),
-        borderRadius: BorderRadius.all(Radius.circular(8)),
+        borderRadius: BorderRadius.all(Radius.circular(12)),
         border: Border.all(color: colors.tertiary.withAlpha(80), width: 4),
         boxShadow: <BoxShadow>[
           CustomBoxShadow(color: colors.tertiary.withAlpha(150)),
