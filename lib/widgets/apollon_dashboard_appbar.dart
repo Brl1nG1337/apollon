@@ -77,21 +77,19 @@ class _ApollonDashboardAppbarState extends State<ApollonDashboardAppbar> {
               ),
             ),
 
-            // LOTTIE ANIMATION
+            const VerticalDivider(color: Colors.white, indent: 20, endIndent: 20, width: 20),
+            Text(
+                _formatTime(_currentTime),
+                style: GoogleFonts.audiowide(fontSize: 36)
+            ),
+            const SizedBox(width: 8,),
             SizedBox(
-              height: 65,
+              width: 50,
               child: Lottie.asset(
                 _currentLottieAsset,
                 fit: BoxFit.fill,
               ),
             ),
-            const VerticalDivider(color: Colors.white, indent: 20, endIndent: 20, width: 20),
-
-            Text(
-                _formatTime(_currentTime),
-                style: GoogleFonts.audiowide(fontSize: 36)
-            ),
-
             const VerticalDivider(color: Colors.white, indent: 20, endIndent: 20, width: 20),
 
             IconButton(
