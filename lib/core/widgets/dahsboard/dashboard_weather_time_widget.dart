@@ -156,9 +156,10 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
                 _formattedTimeStr,
                 key: ValueKey(_formattedTimeStr),
                 style: GoogleFonts.audiowide(
-                  fontSize: 76,
+                  fontSize: 86,
                   letterSpacing: -4,
                   height: 1.0,
+                  color: Theme.of(context).colorScheme.onSurface
                 ),
               ),
             ),

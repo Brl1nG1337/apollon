@@ -21,15 +21,14 @@ class _DashboardWidgetContainerState extends State<DashboardWidgetContainer> {
     var colors = Theme.of(context).colorScheme;
 
     return Container(
-      margin: const EdgeInsets.all(24),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: colors.primary.withAlpha(35),
-        borderRadius: const BorderRadius.all(Radius.circular(12)),
+        borderRadius: const BorderRadius.all(Radius.circular(16)),
         border: Border.all(color: colors.tertiary.withAlpha(80), width: 4),
-        boxShadow: <BoxShadow>[
-          CustomBoxShadow(color: colors.tertiary.withAlpha(150)),
-        ],
+        // boxShadow: <BoxShadow>[
+        //   CustomBoxShadow(color: colors.tertiary.withAlpha(150)),
+        // ],
       ),
       // Wenn isLoading true ist, zentrieren wir den Ladekreis. Ansonsten zeigen wir das Widget.
       child: widget.isLoading
