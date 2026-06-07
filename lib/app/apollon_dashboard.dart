@@ -14,7 +14,7 @@ class _AppWrapperState extends State<ApollonDashboard> {
     var colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white70,
       body: Container(
         width: 800,
         height: 480,
@@ -27,7 +27,30 @@ class _AppWrapperState extends State<ApollonDashboard> {
         ),
         child: Column(
           children: [
-            Row(children: [Text("apollon")]),
+            Container(
+              height: 80,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(50),
+                  topRight: Radius.circular(50),
+                ),
+                color: colors.surface,
+              ),
+              child: Padding(
+                padding: EdgeInsetsGeometry.symmetric(horizontal: 50),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "apollon™",
+                      style: GoogleFonts.audiowide(fontSize: 36),
+                    ),
+                    IconButton(onPressed: () => {}, icon: Icon(Icons.settings)),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),

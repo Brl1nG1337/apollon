@@ -9,11 +9,17 @@ import 'app/apollon_dashboard.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (!kIsWeb &&
-      (Platform.isLinux ||
-          Platform.isWindows ||
-          Platform.isMacOS)) {
+  if (!kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS)) {
+    WidgetsFlutterBinding.ensureInitialized();
+
     await windowManager.ensureInitialized();
+
+    const options = WindowOptions(fullScreen: true);
+
+    await windowManager.waitUntilReadyToShow(options, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
   }
 
   runApp(const ApollonApplication());
@@ -21,8 +27,6 @@ Future<void> main() async {
 
 class ApollonApplication extends StatelessWidget {
   const ApollonApplication({super.key});
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -41,4 +45,3 @@ class ApollonApplication extends StatelessWidget {
     );
   }
 }
-
