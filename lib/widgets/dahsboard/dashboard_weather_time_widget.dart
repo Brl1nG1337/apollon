@@ -127,15 +127,14 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
                   _getGreeting(),
                   key: ValueKey(_currentTime.hour), // Verhindert unnötige Repaints der Begrüßung, außer die Stunde ändert sich
                   style: GoogleFonts.audiowide(
-                      fontSize: 24,
+                      fontSize: 32,
                       letterSpacing: -1,
                       color: Theme.of(context).colorScheme.primary.withAlpha(220)
                   ),
                 ),
-                const SizedBox(height: 4),
                 Text(
                   _formatDate(_currentTime),
-                  style: GoogleFonts.audiowide(fontSize: 32, letterSpacing: -2),
+                  style: GoogleFonts.audiowide(fontSize: 26, letterSpacing: -2),
                 ),
               ],
             ),
