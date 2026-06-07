@@ -38,7 +38,8 @@ class ApollonApplication extends StatelessWidget {
         useMaterial3: true,
         // 2. Das ColorScheme aus einer Seed-Farbe generieren
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1B4249), // Deine Wunsch-Hauptfarbe
+          seedColor: const Color(0xFF1B4249),
+          secondary: const Color(0xFFFFC107),// Deine Wunsch-Hauptfarbe
           brightness: Brightness.dark, // Hell oder Dunkel definieren
         ),
       ),

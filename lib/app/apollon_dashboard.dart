@@ -1,7 +1,5 @@
-import 'package:apollon/core/apollon_constants.dart';
-import 'package:apollon/widgets/apollon_dashboard_appbar.dart';
+import 'package:apollon/widgets/dahsboard/dashboard_weather_time_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class ApollonDashboard extends StatefulWidget {
   const ApollonDashboard({super.key});
@@ -13,28 +11,36 @@ class ApollonDashboard extends StatefulWidget {
 class _AppWrapperState extends State<ApollonDashboard> {
   @override
   Widget build(BuildContext context) {
-    var colors = Theme.of(context).colorScheme;
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: Container(
         width: 800,
         height: 480,
-        child: Column(
+        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
+        child: Stack(
           children: [
-            ApollonDashboardAppbar(),
-            Expanded(
-              flex: 6,
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("assets/images/Apollon Background.png"),
-                    fit: BoxFit.cover,
+            Column(
+              children: [
+                Expanded(
+                  flex: 8,
+                  child: Row(
+                    children: [
+                      Expanded(flex: 8, child: DashboardWeatherTimeWidget()),
+                      Expanded(flex: 4, child: Placeholder()),
+                    ],
                   ),
                 ),
-                child: Column(children: []),
-              ),
+                Expanded(
+                  flex: 4,
+                  child: Row(
+                    children: [
+                      Expanded(flex: 6, child: Placeholder()),
+                      Expanded(flex: 3, child: Placeholder()),
+                      Expanded(flex: 3, child: Placeholder()),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ],
         ),

@@ -9,7 +9,7 @@ class ApollonSettings extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: colors.background,
+      backgroundColor: colors.surface,
       appBar: AppBar(
         backgroundColor: colors.surface,
         elevation: 0,
@@ -21,7 +21,7 @@ class ApollonSettings extends StatelessWidget {
       body: Center(
         child: Text(
           "Apollon™ Konfiguration",
-          style: TextStyle(color: colors.onBackground, fontSize: 18),
+          style: TextStyle(color: colors.onSurface, fontSize: 18),
         ),
       ),
     );
