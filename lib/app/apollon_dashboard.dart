@@ -22,8 +22,8 @@ class _AppWrapperState extends State<ApollonDashboard> {
         child: Column(
           children: [
             Container(
-              height: 80,
-              width: 800,
+              height: 100,
+              width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(ApollonConstants.dashboardCornerRadius),
