@@ -150,17 +150,14 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
             ),
           Align(
             alignment: Alignment.bottomLeft,
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Text(
-                _formattedTimeStr,
-                key: ValueKey(_formattedTimeStr),
-                style: GoogleFonts.audiowide(
-                  fontSize: 86,
-                  letterSpacing: -4,
-                  height: 1.0,
-                  color: Theme.of(context).colorScheme.onSurface
-                ),
+            child: Text(
+              _formattedTimeStr,
+              key: ValueKey(_formattedTimeStr),
+              style: GoogleFonts.audiowide(
+                fontSize: 86,
+                letterSpacing: -4,
+                height: 1.0,
+                color: Theme.of(context).colorScheme.onSurface
               ),
             ),
           ),
@@ -179,7 +176,6 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
                       color:
                       Theme.of(context).colorScheme.primary.withAlpha(220)),
                 ),
-                const SizedBox(height: 2),
                 Text(
                   _formatDate(_currentTime),
                   style:
