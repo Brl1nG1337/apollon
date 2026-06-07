@@ -1,20 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-enum WeatherCondition { sunny, cloudy, rainy, snowy, stormy }
-
-// Hilfsklasse, um sowohl das Wetter als auch den Tag/Nacht-Status an die AppBar zu liefern
 class OpenMeteoResult {
-  final WeatherCondition condition;
+  final String lottieAssetPath;
   final bool isDay;
 
-  OpenMeteoResult({required this.condition, required this.isDay});
+  OpenMeteoResult({required this.lottieAssetPath, required this.isDay});
 }
 
 class WeatherService {
-  // Deine exakt konfigurierte Open-Meteo URL
   final String _apiUrl =
-      "https://api.open-meteo.com/v1/forecast?latitude=51.68&longitude=7.81&timezone=Europe%2FBerlin&forecast_days=1&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m";
+      "https://api.open-meteo.com/v1/forecast?latitude=51.671570&longitude=7.816049&timezone=Europe%2FBerlin&forecast_days=1&current=temperature_2m,is_day,weather_code";
 
   Future<OpenMeteoResult> fetchCurrentWeather() async {
     try {
@@ -24,31 +20,51 @@ class WeatherService {
         final data = jsonDecode(response.body);
         final current = data['current'];
 
-        // 1. Wetter-Code auslesen
         final int weatherCode = current['weather_code'];
-        // 2. Is_Day Flag auslesen (1 = Tag, 0 = Nacht)
         final bool isDay = current['is_day'] == 1;
 
-        final condition = _mapWmoCodeToCondition(weatherCode);
+        final lottiePath = _mapWmoToLottie(weatherCode, isDay);
 
-        return OpenMeteoResult(condition: condition, isDay: isDay);
+        return OpenMeteoResult(lottieAssetPath: lottiePath, isDay: isDay);
       } else {
-        print("Open-Meteo Fehler: ${response.statusCode}");
-        return OpenMeteoResult(condition: WeatherCondition.cloudy, isDay: true);
+        return OpenMeteoResult(lottieAssetPath: 'assets/lottie/cloudy day.json', isDay: true);
       }
     } catch (e) {
-      print("Netzwerkfehler bei Open-Meteo: $e");
-      return OpenMeteoResult(condition: WeatherCondition.cloudy, isDay: true);
+      return OpenMeteoResult(lottieAssetPath: 'assets/lottie/cloudy day.json', isDay: true);
     }
   }
 
-  // Übersetzung der WMO (World Meteorological Organization) Codes
-  WeatherCondition _mapWmoCodeToCondition(int code) {
-    if (code == 0 || code == 1) return WeatherCondition.sunny; // Klar oder leicht bewölkt
-    if (code == 2 || code == 3 || (code >= 45 && code <= 48)) return WeatherCondition.cloudy; // Bewölkt, Nebel
-    if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return WeatherCondition.rainy; // Niesel, Regen, Schauer
-    if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) return WeatherCondition.snowy; // Schnee
-    if (code >= 95 && code <= 99) return WeatherCondition.stormy; // Gewitter
-    return WeatherCondition.cloudy; // Fallback
+  String _mapWmoToLottie(int code, bool isDay) {
+    const base = 'assets/lottie/';
+    final suffix = isDay ? 'day.json' : 'night.json';
+
+    // 1. Klarer Himmel
+    if (code == 0) {
+      return '${base}clear $suffix';
+    }
+
+    // 2. Bewölkt / Nebel / Sehr leichter Nieselregen
+    // WMO 51, 53 = Leichter/Mäßiger Nieselregen -> Zeige hier lieber noch "cloudy"
+    if (code >= 1 && code <= 48 || code == 51 || code == 53) {
+      return '${base}cloudy $suffix';
+    }
+
+    // 3. Echter Regen (Starker Niesel, mäßiger bis starker Regen & Schauer)
+    // WMO 55 = Dichter Nieselregen, 61-67 = Regen, 80-82 = Regenschauer
+    if (code == 55 || (code >= 61 && code <= 67) || (code >= 80 && code <= 82)) {
+      return '${base}rainy $suffix';
+    }
+
+    // 4. Schnee
+    if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) {
+      return '${base}snow $suffix';
+    }
+
+    // 5. Gewitter
+    if (code >= 95) {
+      return '${base}stormy $suffix';
+    }
+
+    return '${base}cloudy $suffix';
   }
 }
