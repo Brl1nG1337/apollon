@@ -22,19 +22,19 @@ class _AppWrapperState extends State<ApollonDashboard> {
         child: Column(
           children: [
             Expanded(
-              flex: 2,
+              flex: 1,
               child: Container(
                 width: double.infinity,
                 color: colors.surface,
                 child: Padding(
-                  padding: EdgeInsetsGeometry.symmetric(horizontal: 32),
+                  padding: EdgeInsetsGeometry.only(left: 16, right: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text("Apollon™", style: GoogleFonts.audiowide(fontSize: 36)),
                       IconButton(
                         onPressed: () => {},
-                        icon: Icon(Icons.settings, size: 48),
+                        icon: Icon(Icons.settings, size: 36),
                       ),
                     ],
                   ),
@@ -42,7 +42,7 @@ class _AppWrapperState extends State<ApollonDashboard> {
               ),
             ),
             Expanded(
-              flex: 8,
+              flex: 6,
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
