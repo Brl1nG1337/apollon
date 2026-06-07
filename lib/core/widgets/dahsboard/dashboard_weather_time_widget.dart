@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'package:apollon/widgets/dahsboard/dashboard_widget_container.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
-import '../../services/apollon_weather_service.dart';
+import '../../services/weather_service.dart';
+import 'dashboard_widget_container.dart';
 
 class DashboardWeatherTimeWidget extends StatefulWidget {
   const DashboardWeatherTimeWidget({super.key});
@@ -13,16 +13,19 @@ class DashboardWeatherTimeWidget extends StatefulWidget {
       _DashboardWeatherTimeWidgetState();
 }
 
-class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget> {
+class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
+    with TickerProviderStateMixin {
   late DateTime _currentTime;
   Timer? _clockTimer;
   Timer? _weatherTimer;
 
   final WeatherService _weatherService = WeatherService();
-  String _currentLottieAsset = 'assets/lottie/cloudy day.json';
 
-  // Wir halten die formatierte Zeit direkt als State-Variable
+  String? _currentLottieAsset;
   String _formattedTimeStr = "00:00";
+  bool _fontsLoaded = false;
+
+  late final AnimationController _lottieController;
 
   @override
   void initState() {
@@ -30,22 +33,33 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
     _currentTime = DateTime.now();
     _formattedTimeStr = _formatTime(_currentTime);
 
-    // Uhrzeit-Update (Sekündlich)
+    _lottieController = AnimationController(vsync: this);
+
+    _waitForFonts();
+
     _clockTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
         setState(() {
           _currentTime = DateTime.now();
-          // Hier erzwingen wir die direkte Zuweisung im State-Wechsel
           _formattedTimeStr = _formatTime(_currentTime);
         });
       }
     });
 
-    // Wetter-Update (Alle 15 Min)
     _updateWeather();
     _weatherTimer = Timer.periodic(const Duration(minutes: 15), (timer) {
       _updateWeather();
     });
+  }
+
+  void _waitForFonts() async {
+    GoogleFonts.audiowide();
+    await GoogleFonts.pendingFonts();
+    if (mounted) {
+      setState(() {
+        _fontsLoaded = true;
+      });
+    }
   }
 
   void _updateWeather() async {
@@ -54,7 +68,6 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
       setState(() {
         _currentLottieAsset = result.lottieAssetPath;
       });
-      print("=== APOLLON DEBUG: Geladenes Lottie-Asset ist: $_currentLottieAsset ===");
     }
   }
 
@@ -62,6 +75,7 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
   void dispose() {
     _clockTimer?.cancel();
     _weatherTimer?.cancel();
+    _lottieController.dispose();
     super.dispose();
   }
 
@@ -83,40 +97,72 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
   }
 
   String _formatDate(DateTime time) {
-    const weekdays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
-    const months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+    const weekdays = [
+      "Montag",
+      "Dienstag",
+      "Mittwoch",
+      "Donnerstag",
+      "Freitag",
+      "Samstag",
+      "Sonntag"
+    ];
+    const months = [
+      "Januar",
+      "Februar",
+      "März",
+      "April",
+      "Mai",
+      "Juni",
+      "Juli",
+      "August",
+      "September",
+      "Oktober",
+      "November",
+      "Dezember"
+    ];
 
     return "${weekdays[time.weekday - 1]}, ${time.day}. ${months[time.month - 1]} ${time.year}";
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool isLoading = _currentLottieAsset == null || !_fontsLoaded;
+
     return DashboardWidgetContainer(
+      isLoading: isLoading,
       child: Stack(
         children: [
-          // Wetter-Animation unten rechts
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Lottie.asset(
-              _currentLottieAsset,
-              key: ValueKey(_currentLottieAsset),
-              height: 150,
-              repeat: true,
-              animate: true,
+          if (_currentLottieAsset != null)
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Lottie.asset(
+                _currentLottieAsset!,
+                key: ValueKey(_currentLottieAsset),
+                height: 150,
+                repeat: true,
+                animate: true,
+                controller: _lottieController,
+                onLoaded: (composition) {
+                  _lottieController.duration = composition.duration * 3;
+                  _lottieController.repeat();
+                },
+              ),
             ),
-          ),
-
-          // Große Uhrzeit unten links
           Align(
             alignment: Alignment.bottomLeft,
-            child: Text(
-              _formattedTimeStr, // Nutzt jetzt den reinen, reaktiven String
-              key: ValueKey(_formattedTimeStr), // Zwingt Flutter zum Neu-Rendern des Text-Knotens bei jeder Änderung
-              style: GoogleFonts.audiowide(fontSize: 88, letterSpacing: -5),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                _formattedTimeStr,
+                key: ValueKey(_formattedTimeStr),
+                style: GoogleFonts.audiowide(
+                  fontSize: 76,
+                  letterSpacing: -4,
+                  height: 1.0,
+                ),
+              ),
             ),
           ),
-
-          // Begrüßung und Datum oben links
           Align(
             alignment: Alignment.topLeft,
             child: Column(
@@ -125,16 +171,18 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
               children: [
                 Text(
                   _getGreeting(),
-                  key: ValueKey(_currentTime.hour), // Verhindert unnötige Repaints der Begrüßung, außer die Stunde ändert sich
+                  key: ValueKey(_currentTime.hour),
                   style: GoogleFonts.audiowide(
-                      fontSize: 32,
+                      fontSize: 36,
                       letterSpacing: -1,
-                      color: Theme.of(context).colorScheme.primary.withAlpha(220)
-                  ),
+                      color:
+                      Theme.of(context).colorScheme.primary.withAlpha(220)),
                 ),
+                const SizedBox(height: 2),
                 Text(
                   _formatDate(_currentTime),
-                  style: GoogleFonts.audiowide(fontSize: 26, letterSpacing: -2),
+                  style:
+                  GoogleFonts.audiowide(fontSize: 26, letterSpacing: -1.5),
                 ),
               ],
             ),
