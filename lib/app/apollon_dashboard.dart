@@ -1,3 +1,4 @@
+import 'package:apollon/core/apollon_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -18,22 +19,15 @@ class _AppWrapperState extends State<ApollonDashboard> {
       body: Container(
         width: 800,
         height: 480,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/images/Apollon Background.png"),
-            fit: BoxFit.cover,
-          ),
-          borderRadius: BorderRadius.circular(50),
-        ),
         child: Column(
           children: [
             Container(
               height: 80,
-              width: double.infinity,
+              width: 800,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(50),
-                  topRight: Radius.circular(50),
+                  topLeft: Radius.circular(ApollonConstants.dashboardCornerRadius),
+                  topRight: Radius.circular(ApollonConstants.dashboardCornerRadius),
                 ),
                 color: colors.surface,
               ),
@@ -42,13 +36,29 @@ class _AppWrapperState extends State<ApollonDashboard> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "apollon™",
-                      style: GoogleFonts.audiowide(fontSize: 36),
+                    Text("Apollon™", style: GoogleFonts.audiowide(fontSize: 36)),
+                    IconButton(
+                      onPressed: () => {},
+                      icon: Icon(Icons.settings, size: 48),
                     ),
-                    IconButton(onPressed: () => {}, icon: Icon(Icons.settings)),
                   ],
                 ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("assets/images/Apollon Background.png"),
+                    fit: BoxFit.cover,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(ApollonConstants.dashboardCornerRadius),
+                    bottomRight: Radius.circular(ApollonConstants.dashboardCornerRadius),
+                  ),
+                ),
+                child: Column(children: []),
               ),
             ),
           ],
