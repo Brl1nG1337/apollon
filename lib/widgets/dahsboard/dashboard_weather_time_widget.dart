@@ -74,7 +74,7 @@ class _DashboardWeatherTimeWidgetState
             alignment: AlignmentGeometry.bottomRight,
             child: Lottie.asset(
               _currentLottieAsset,
-              height: 164,
+              height: 150,
               repeat: true,
               animate: true,
             ),
