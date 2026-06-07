@@ -24,7 +24,7 @@ class _AppWrapperState extends State<ApollonDashboard> {
               Column(
                 children: [
                   Expanded(
-                    flex: 7,
+                    flex: 8,
                     child: Row(
                       children: [
                         const Expanded(flex: 8, child: DashboardWeatherTimeWidget()),
@@ -35,7 +35,7 @@ class _AppWrapperState extends State<ApollonDashboard> {
                   ),
                   const SizedBox(height: 16),
                   Expanded(
-                    flex: 5,
+                    flex: 4,
                     child: Row(
                       children: [
                         Expanded(
