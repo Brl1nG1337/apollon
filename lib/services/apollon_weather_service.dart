@@ -38,33 +38,33 @@ class WeatherService {
     const base = 'assets/lottie/';
     final suffix = isDay ? 'day.json' : 'night.json';
 
-    // 1. Klarer Himmel
+    // 1. Klarer Himmel (WMO 0)
     if (code == 0) {
       return '${base}clear $suffix';
     }
 
-    // 2. Bewölkt / Nebel / Sehr leichter Nieselregen
-    // WMO 51, 53 = Leichter/Mäßiger Nieselregen -> Zeige hier lieber noch "cloudy"
-    if (code >= 1 && code <= 48 || code == 51 || code == 53) {
+    // 2. ALLES von WMO 1 bis unter 61 wird zu "cloudy"
+    // Das fängt alle Wolken-, Nebel- und Nieselregen-Codes (51, 53, 55, 56, 57) ab!
+    if (code <= 61) {
       return '${base}cloudy $suffix';
     }
 
-    // 3. Echter Regen (Starker Niesel, mäßiger bis starker Regen & Schauer)
-    // WMO 55 = Dichter Nieselregen, 61-67 = Regen, 80-82 = Regenschauer
-    if (code == 55 || (code >= 61 && code <= 67) || (code >= 80 && code <= 82)) {
+    // 3. Echter Regen (WMO 61 bis 67 und die Regenschauer 80 bis 82)
+    if ((code > 61 && code <= 67) || (code >= 80 && code <= 82)) {
       return '${base}rainy $suffix';
     }
 
-    // 4. Schnee
+    // 4. Schnee (WMO 71 bis 77 und 85, 86)
     if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) {
       return '${base}snow $suffix';
     }
 
-    // 5. Gewitter
+    // 5. Gewitter (WMO 95 bis 99)
     if (code >= 95) {
       return '${base}stormy $suffix';
     }
 
+    // Extrem unwahrscheinlicher Fallback
     return '${base}cloudy $suffix';
   }
 }
