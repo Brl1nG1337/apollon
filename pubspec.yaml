@@ -12,6 +12,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   window_manager: ^0.5.1
   google_fonts: 6.3.3
+  http: ^1.2.0
+  weather_icons: ^3.0.0
 
 dev_dependencies:
   flutter_test:
