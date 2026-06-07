@@ -1,4 +1,5 @@
 import 'package:apollon/core/apollon_constants.dart';
+import 'package:apollon/widgets/apollon_dashboard_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -21,26 +22,7 @@ class _AppWrapperState extends State<ApollonDashboard> {
         height: 480,
         child: Column(
           children: [
-            Expanded(
-              flex: 1,
-              child: Container(
-                width: double.infinity,
-                color: colors.surface,
-                child: Padding(
-                  padding: EdgeInsetsGeometry.only(left: 16, right: 8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Apollon™", style: GoogleFonts.audiowide(fontSize: 36)),
-                      IconButton(
-                        onPressed: () => {},
-                        icon: Icon(Icons.settings, size: 36),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+            ApollonDashboardAppbar(),
             Expanded(
               flex: 6,
               child: Container(
