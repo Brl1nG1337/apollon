@@ -21,16 +21,22 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
   final WeatherService _weatherService = WeatherService();
   String _currentLottieAsset = 'assets/lottie/cloudy day.json';
 
+  // Wir halten die formatierte Zeit direkt als State-Variable
+  String _formattedTimeStr = "00:00";
+
   @override
   void initState() {
     super.initState();
     _currentTime = DateTime.now();
+    _formattedTimeStr = _formatTime(_currentTime);
 
     // Uhrzeit-Update (Sekündlich)
     _clockTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
         setState(() {
           _currentTime = DateTime.now();
+          // Hier erzwingen wir die direkte Zuweisung im State-Wechsel
+          _formattedTimeStr = _formatTime(_currentTime);
         });
       }
     });
@@ -63,7 +69,6 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
     return "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
   }
 
-  // Generiert die dynamische Begrüßung je nach Stunde
   String _getGreeting() {
     final hour = _currentTime.hour;
     if (hour >= 5 && hour < 12) {
@@ -77,7 +82,6 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
     }
   }
 
-  // Formatiert das Datum auf Deutsch (ohne extra intl-Package-Zwang)
   String _formatDate(DateTime time) {
     const weekdays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
     const months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
@@ -92,10 +96,10 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
         children: [
           // Wetter-Animation unten rechts
           Align(
-            alignment: Alignment.bottomRight, // AlignmentGeometry bereinigt auf Alignment
+            alignment: Alignment.bottomRight,
             child: Lottie.asset(
               _currentLottieAsset,
-              key: ValueKey(_currentLottieAsset), // Verhindert Einfrieren des Loops bei Asset-Wechsel
+              key: ValueKey(_currentLottieAsset),
               height: 150,
               repeat: true,
               animate: true,
@@ -106,12 +110,13 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
           Align(
             alignment: Alignment.bottomLeft,
             child: Text(
-              _formatTime(_currentTime),
-              style: GoogleFonts.audiowide(fontSize: 94, letterSpacing: -5),
+              _formattedTimeStr, // Nutzt jetzt den reinen, reaktiven String
+              key: ValueKey(_formattedTimeStr), // Zwingt Flutter zum Neu-Rendern des Text-Knotens bei jeder Änderung
+              style: GoogleFonts.audiowide(fontSize: 88, letterSpacing: -5),
             ),
           ),
 
-          // Begrüßung und Datum oben links untereinander
+          // Begrüßung und Datum oben links
           Align(
             alignment: Alignment.topLeft,
             child: Column(
@@ -120,15 +125,17 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
               children: [
                 Text(
                   _getGreeting(),
+                  key: ValueKey(_currentTime.hour), // Verhindert unnötige Repaints der Begrüßung, außer die Stunde ändert sich
                   style: GoogleFonts.audiowide(
-                      fontSize: 36,
+                      fontSize: 24,
                       letterSpacing: -1,
-                      color: Theme.of(context).colorScheme.primary.withAlpha(220) // Hebt die Begrüßung farblich leicht ab
+                      color: Theme.of(context).colorScheme.primary.withAlpha(220)
                   ),
                 ),
+                const SizedBox(height: 4),
                 Text(
                   _formatDate(_currentTime),
-                  style: GoogleFonts.audiowide(fontSize: 28, letterSpacing: -2),
+                  style: GoogleFonts.audiowide(fontSize: 32, letterSpacing: -2),
                 ),
               ],
             ),
