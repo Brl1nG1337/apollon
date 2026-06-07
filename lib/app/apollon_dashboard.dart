@@ -15,7 +15,7 @@ class _AppWrapperState extends State<ApollonDashboard> {
     var colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.white70,
+      backgroundColor: Colors.black,
       body: Container(
         width: 800,
         height: 480,
