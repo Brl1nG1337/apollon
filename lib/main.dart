@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:apollon/app/app_init_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
@@ -31,7 +32,7 @@ class ApollonApplication extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Apollon',
-      home: ApollonDashboardPage(),
+      home: AppInitPage(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

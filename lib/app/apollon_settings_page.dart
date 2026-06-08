@@ -15,12 +15,12 @@ class ApollonSettingsPage extends StatefulWidget {
 class _ApollonSettingsPageState extends State<ApollonSettingsPage> {
   int current_tab = 0;
 
-  // Deine Tab-Definitionen (Daten)
+  // Deine neuen, optimierten Tab-Definitionen
   final List<String> _tabTitles = ["Allgemein", "Geräte", "Netzwerk", "MQTT"];
   final List<IconData> _tabIcons = [
     Icons.settings_rounded,
     Icons.devices_other_rounded,
-    Icons.network_check_rounded,
+    Icons.network_wifi_3_bar_outlined,
     Icons.cloud,
   ];
 
@@ -46,16 +46,16 @@ class _ApollonSettingsPageState extends State<ApollonSettingsPage> {
                       icons: _tabIcons,
                       onTabSelected: (index) {
                         setState(() {
-                          current_tab = index; // Aktualisiert die UI bei Klick
+                          current_tab = index;
                         });
                       },
                     ),
                   ),
                 ),
 
-                // Rechte Seite: Dynamischer Inhalt (Flex 9)
+                // Rechte Seite: Dynamischer Inhalt mit Animation (Flex 9)
                 Expanded(
-                  flex: 11,
+                  flex: 9,
                   child: Container(
                     color: colors.surface,
                     padding: const EdgeInsets.all(16.0),
@@ -70,19 +70,62 @@ class _ApollonSettingsPageState extends State<ApollonSettingsPage> {
     );
   }
 
-  // Diese Methode liefert je nach ausgewähltem Tab die passende UI zurück
+  // Liefert den Inhalt zurück und verpackt ihn in eine weiche Transition
   Widget _buildTabContent(int tabIndex) {
+    Widget content;
+
+    // WICHTIG: Jedes Widget braucht eine eindeutige 'ValueKey',
+    // damit der AnimatedSwitcher merkt, dass sich der Inhalt geändert hat!
     switch (tabIndex) {
       case 0:
-        return const Placeholder();
-      case 1:
-        return const Center(
-          child: Text("MQTT Broker & Datenstrom-Einstellungen"),
+        content = const Center(
+          key: ValueKey("general"),
+          child: Text("Allgemeine Apollon Konfigurationen"),
         );
+        break;
+      case 1:
+        content = const Center(key: ValueKey("devices"), child: Text("Geräte verwalten"),);
+        break;
       case 2:
-        return const Center(child: Text("Allgemeine Apollon Konfigurationen"));
+        content = const Center(
+          key: ValueKey("network"),
+          child: Text("Netzwerk-Verbindungen & Pi-Status"),
+        );
+        break;
+      case 3:
+        content = const Center(
+          key: ValueKey("mqtt"),
+          child: Text("MQTT Broker & Datenstrom-Konfiguration"),
+        );
+        break;
       default:
-        return const SizedBox.shrink();
+        content = const SizedBox.shrink();
     }
+
+    // Hier läuft die Magie für den Content-Wechsel
+    // Hier läuft die Magie für den Content-Wechsel
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      // Kombinierter Fade-In & dezenter Slide-Up-Effekt
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0.0, 0.02), // Ein ganz feiner Hub von unten nach oben
+              end: Offset.zero,
+            ).animate(
+              // SO ist es richtig: Wir übergeben ein CurvedAnimation-Objekt
+              CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+              ),
+            ),
+            child: child,
+          ),
+        );
+      },
+      child: content,
+    );
   }
 }

@@ -19,11 +19,15 @@ class ApollonTextIconSelectionListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
-    return Container(
+    return AnimatedContainer(
+      // --- HIER STECKT DIE ANIMATION ---
+      duration: const Duration(milliseconds: 250), // Zeit für den Farbübergang
+      curve: Curves.easeInOut,                     // Sanftes Ein- und Ausblenden
+
       color: isSelected
-          ? colors
-                .primaryContainer // Farbe für den aktiven Tab (z.B. hellblau/-grau)
+          ? colors.primaryContainer // Farbe für den aktiven Tab
           : Colors.transparent,
+
       child: ListTile(
         // Inhalt leicht nach innen rücken, damit es im Rechteck gut aussieht
         contentPadding: const EdgeInsets.symmetric(
@@ -42,7 +46,7 @@ class ApollonTextIconSelectionListTile extends StatelessWidget {
           style: GoogleFonts.audiowide(
             fontWeight: isSelected ? FontWeight.w200 : FontWeight.w100,
             color: isSelected ? colors.onPrimaryContainer : colors.onSurface,
-            fontSize: 24
+            fontSize: 24,
           ),
         ),
         onTap: onTap,

@@ -1,0 +1,64 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
+import '../../model/apollon_setting.dart';
+import '../../model/apollon_settings_profile.dart';
+
+class ApollonSettingsService {
+  // Ersetze die IP mit der deines Raspberry Pi / Spring Boot Backends.
+  // Falls du im Emulator testest, nutze 'http://10.0.2.2:8080'
+  final String baseUrl;
+
+  ApollonSettingsService({this.baseUrl = 'http://localhost:8080/api/settings'});
+
+  /// Holt das Einstellungs-Profil anhand seines Namens (z.B. "Default") vom Backend
+  Future<ApollonSettingsProfile> fetchProfile(String profileName) async {
+    final url = Uri.parse('$baseUrl/profiles/$profileName');
+
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // UTF-8 Dekodierung zwingend erforderlich wegen Umlauten (z.B. "Geräte")
+        final Map<String, dynamic> decodedJson = jsonDecode(
+          utf8.decode(response.bodyBytes),
+        );
+        return ApollonSettingsProfile.fromJson(decodedJson);
+      } else {
+        throw Exception(
+          'Fehler beim Laden des Profils. Server antwortete mit Status: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      throw Exception('Netzwerkfehler beim Apollon-API-Aufruf: $e');
+    }
+  }
+
+  /// Sendet ein aktualisiertes Setting zurück an das Spring Boot Backend
+  Future<bool> updateSetting(String profileName, ApollonSetting setting) async {
+    final url = Uri.parse(
+      '$baseUrl/profiles/$profileName/settings/${setting.key}',
+    );
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(setting.toJson()),
+      );
+
+      // 200 OK oder 204 No Content sind typische Spring-Erfolgsmeldungen
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (e) {
+      // Hier könnte man optional loggen
+      return false;
+    }
+  }
+}
