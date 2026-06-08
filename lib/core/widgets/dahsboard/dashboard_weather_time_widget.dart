@@ -140,7 +140,7 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
                 child: Lottie.asset(
                   _currentLottieAsset!,
                   key: ValueKey(_currentLottieAsset),
-                  height: 150,
+                  height: 140,
                   repeat: true,
                   animate: true,
                   controller: _lottieController,
