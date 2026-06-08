@@ -134,7 +134,7 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
         children: [
           if (_currentLottieAsset != null)
             Padding(
-              padding: const EdgeInsets.only(top: 72),
+              padding: const EdgeInsets.only(top: 40),
               child: Align(
                 alignment: Alignment.topRight,
                 child: Lottie.asset(
