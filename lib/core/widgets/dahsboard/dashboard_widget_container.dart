@@ -20,6 +20,8 @@ class _DashboardWidgetContainerState extends State<DashboardWidgetContainer> {
     var colors = Theme.of(context).colorScheme;
 
     return Container(
+      width: double.infinity,
+      height: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: colors.primary.withAlpha(35),

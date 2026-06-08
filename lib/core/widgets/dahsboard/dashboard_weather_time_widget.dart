@@ -133,19 +133,22 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
       child: Stack(
         children: [
           if (_currentLottieAsset != null)
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Lottie.asset(
-                _currentLottieAsset!,
-                key: ValueKey(_currentLottieAsset),
-                height: 150,
-                repeat: true,
-                animate: true,
-                controller: _lottieController,
-                onLoaded: (composition) {
-                  _lottieController.duration = composition.duration * 3;
-                  _lottieController.repeat();
-                },
+            Padding(
+              padding: const EdgeInsets.only(top: 72),
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Lottie.asset(
+                  _currentLottieAsset!,
+                  key: ValueKey(_currentLottieAsset),
+                  height: 150,
+                  repeat: true,
+                  animate: true,
+                  controller: _lottieController,
+                  onLoaded: (composition) {
+                    _lottieController.duration = composition.duration * 3;
+                    _lottieController.repeat();
+                  },
+                ),
               ),
             ),
           Align(
@@ -154,7 +157,7 @@ class _DashboardWeatherTimeWidgetState extends State<DashboardWeatherTimeWidget>
               _formattedTimeStr,
               key: ValueKey(_formattedTimeStr),
               style: GoogleFonts.audiowide(
-                fontSize: 96,
+                fontSize: 100,
                 letterSpacing: -4,
                 height: 1.0,
                 color: Theme.of(context).colorScheme.onSurface

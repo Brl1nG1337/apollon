@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
-
-import 'app/apollon_dashboard.dart';
+import 'app/apollon_dashboard_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,7 +31,7 @@ class ApollonApplication extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Apollon',
-      home: ApollonDashboard(),
+      home: ApollonDashboardPage(),
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
