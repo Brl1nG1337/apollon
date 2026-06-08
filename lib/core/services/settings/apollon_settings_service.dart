@@ -10,7 +10,7 @@ class ApollonSettingsService {
   // Falls du im Emulator testest, nutze 'http://10.0.2.2:8080'
   final String baseUrl;
 
-  ApollonSettingsService({this.baseUrl = 'http://localhost:8080/api/settings'});
+  ApollonSettingsService({this.baseUrl = 'http://192.168.0.128:8080/api/settings'});
 
   /// Holt das Einstellungs-Profil anhand seines Namens (z.B. "Default") vom Backend
   Future<ApollonSettingsProfile> fetchProfile(String profileName) async {
