@@ -29,11 +29,7 @@ class _ApollonAnimatedBackgroundState extends State<ApollonAnimatedBackground> {
         }
 
         final weatherData = weatherProv.weatherData!;
-        final screenWidth = MediaQuery.of(context).size.width;
-
-        // Der Horizont liegt im unteren Bereich des 5-Zoll Displays
-        final horizonHeight = MediaQuery.of(context).size.height * 0.8;
-        final celestialPos = weatherData.getPosition(screenWidth, horizonHeight);
+        final celestialPos = weatherData.getPosition(800, 400);
 
         return Stack(
           children: [
@@ -47,7 +43,7 @@ class _ApollonAnimatedBackgroundState extends State<ApollonAnimatedBackground> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: weatherData.isDay
-                      ? [Colors.lightBlue.shade300, Colors.lightBlue.shade100]
+                      ? [Colors.lightBlue.shade800, Colors.lightBlue.shade400]
                       : [const Color(0xFF0B1026), const Color(0xFF1B2755)],
                 ),
               ),
@@ -60,8 +56,7 @@ class _ApollonAnimatedBackgroundState extends State<ApollonAnimatedBackground> {
               left: celestialPos.left,
               top: celestialPos.top,
               child: weatherData.isDay
-                  ? Lottie.asset('lottie/animated-background/sun.json', width: 90, height: 90)
-              // Hier wird jetzt das SVG gerendert!
+                  ? Lottie.asset('lottie/sun.json', width: 90, height: 90)
                   : SvgPicture.asset(weatherData.moonPhaseAsset, width: 90, height: 90),
             ),
 

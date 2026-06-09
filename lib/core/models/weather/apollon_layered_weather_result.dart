@@ -25,7 +25,7 @@ class ApollonLayeredWeatherResult {
   });
 
   ApollonCelestialPosition getPosition(double displayWidth, double baseHeight) {
-    double radius = displayWidth / 2;
+    double radius = displayWidth / 2.2;
     double theta = pi * celestialProgress;
     return ApollonCelestialPosition(
       radius - (radius * cos(theta)),

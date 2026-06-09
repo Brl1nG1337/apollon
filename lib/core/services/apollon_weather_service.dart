@@ -4,8 +4,9 @@ import 'package:http/http.dart' as http;
 import '../models/weather/apollon_layered_weather_result.dart';
 
 class ApollonWeatherService {
+  // 1. FEHLER BEHOBEN: 'moon_phase' wurde aus der URL entfernt!
   final String _apiUrl =
-      "https://api.open-meteo.com/v1/forecast?latitude=51.671570&longitude=7.816049&timezone=Europe%2FBerlin&current=temperature_2m,is_day,weather_code&daily=sunrise,sunset,moon_phase&forecast_days=1";
+      "https://api.open-meteo.com/v1/forecast?latitude=51.671570&longitude=7.816049&timezone=Europe%2FBerlin&current=temperature_2m,is_day,weather_code&daily=sunrise,sunset&forecast_days=1";
 
   Future<ApollonLayeredWeatherResult> fetchCurrentWeather() async {
     try {
@@ -21,13 +22,13 @@ class ApollonWeatherService {
         final daily = data['daily'];
         final DateTime sunrise = DateTime.parse(daily['sunrise'][0]);
         final DateTime sunset = DateTime.parse(daily['sunset'][0]);
-        final double moonPhaseRaw = daily['moon_phase'][0];
         final DateTime now = DateTime.now();
 
         final progress = _calculateCelestialProgress(now, sunrise, sunset, isDay);
-
-        // Holt die Wolkenanzahl, den Wolkentyp und das passende Overlay für Ebene 2
         final weather = _mapWmoToWeather(weatherCode);
+
+        // 2. NEU: Wir berechnen die Mondphase offline!
+        final double moonPhaseRaw = _calculateMoonPhase(now);
 
         final bool showStars = !isDay && weatherCode <= 3;
 
@@ -46,6 +47,25 @@ class ApollonWeatherService {
     } catch (e) {
       return _fallbackData();
     }
+  }
+
+  // ==========================================
+  // HILFSMETHODEN
+  // ==========================================
+
+  /// Berechnet die Mondphase lokal ohne API (Wert von 0.0 bis 1.0)
+  double _calculateMoonPhase(DateTime date) {
+    // Referenz: Ein bekannter Neumond war am 11. Januar 2024 um 11:57 UTC
+    final newMoon = DateTime.utc(2024, 1, 11, 11, 57);
+    // Länge eines kompletten Mondzyklus in Minuten
+    const lunarCycleMinutes = 29.530588 * 24 * 60;
+
+    final difference = date.difference(newMoon).inMinutes;
+    // Modulo 1.0 gibt uns nur den zyklischen Fortschritt
+    double phase = (difference / lunarCycleMinutes) % 1.0;
+
+    if (phase < 0) phase += 1.0; // Absicherung für alte Daten
+    return phase;
   }
 
   double _calculateCelestialProgress(DateTime now, DateTime sunrise, DateTime sunset, bool isDay) {
@@ -71,52 +91,34 @@ class ApollonWeatherService {
     }
   }
 
-  /// Mappt den Wettercode auf die genauen Dateinamen aus deinem Screenshot
   ({int count, String? cloud, String? overlay}) _mapWmoToWeather(int code) {
-    const base = 'lottie/animated-background/';
+    // WICHTIG: Achte darauf, dass 'assets/' hier am Anfang steht,
+    // sonst findet Flutter Web die Datei oft nicht!
+    const base = 'assets/lottie/';
 
-    // 0: Klarer Himmel
     if (code == 0) return (count: 0, cloud: null, overlay: null);
-
-    // 1-3: Leicht bis stark bewölkt (weiße Wolken)
     if (code == 1) return (count: 2, cloud: '${base}cloud.json', overlay: null);
     if (code == 2) return (count: 4, cloud: '${base}cloud.json', overlay: null);
     if (code == 3) return (count: 6, cloud: '${base}cloud.json', overlay: null);
-
-    // 45-57: Nebel und Nieselregen (Viele Wolken)
     if (code >= 45 && code <= 57) return (count: 6, cloud: '${base}cloud.json', overlay: null);
+    if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) return (count: 5, cloud: '${base}dark_cloud.json', overlay: '${base}rain_overlay.json');
+    if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) return (count: 5, cloud: '${base}cloud.json', overlay: '${base}snow_overlay.json');
+    if (code >= 95) return (count: 6, cloud: '${base}dark_cloud.json', overlay: '${base}dark_cloud_lightning.json');
 
-    // 61-67 & 80-82: Echter Regen (Dunkle Wolken + Regen-Overlay)
-    if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82)) {
-      return (count: 5, cloud: '${base}dark cloud.json', overlay: '${base}rain_overlay.json');
-    }
-
-    // 71-77 & 85-86: Schnee (Weiße Wolken + Schnee-Overlay)
-    if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) {
-      return (count: 5, cloud: '${base}cloud.json', overlay: '${base}snow_overlay.json');
-    }
-
-    // 95-99: Gewitter (Dunkle Wolken + Blitz-Overlay)
-    if (code >= 95) {
-      return (count: 6, cloud: '${base}dark cloud.json', overlay: '${base}dark cloud lightning.json');
-    }
-
-    // Fallback
     return (count: 3, cloud: '${base}cloud.json', overlay: null);
   }
 
-  /// Gibt die passenden SVG-Pfade für die Mondphasen zurück
   String _getMoonPhaseSvg(double phase) {
-    // TIPP: Passe diesen Pfad an, falls deine SVGs nicht im lottie-Ordner liegen!
     const base = 'assets/svgs/';
 
-    if (phase == 0.0 || phase == 1.0) return '${base}moon_new.svg';
-    if (phase > 0.0 && phase < 0.25) return '${base}moon_waxing_crescent.svg';
-    if (phase == 0.25) return '${base}moon_first_quarter.svg';
-    if (phase > 0.25 && phase < 0.5) return '${base}moon_waxing_gibbous.svg';
-    if (phase == 0.5) return '${base}moon_full.svg';
-    if (phase > 0.5 && phase < 0.75) return '${base}moon_waning_gibbous.svg';
-    if (phase == 0.75) return '${base}moon_last_quarter.svg';
+    // 3. NEU: Robuste Logik mit Spannen statt exakten Werten (== 0.25 funktioniert bei Floats schlecht)
+    if (phase < 0.03 || phase > 0.97) return '${base}moon_new.svg';
+    if (phase < 0.22) return '${base}moon_waxing_crescent.svg';
+    if (phase < 0.28) return '${base}moon_first_quarter.svg';
+    if (phase < 0.47) return '${base}moon_waxing_gibbous.svg';
+    if (phase < 0.53) return '${base}moon_full.svg';
+    if (phase < 0.72) return '${base}moon_waning_gibbous.svg';
+    if (phase < 0.78) return '${base}moon_last_quarter.svg';
 
     return '${base}moon_waning_crescent.svg';
   }
@@ -125,10 +127,10 @@ class ApollonWeatherService {
     return ApollonLayeredWeatherResult(
       isDay: true,
       celestialProgress: 0.5,
-      moonPhaseAsset: 'svg/moon_full.svg',
+      moonPhaseAsset: 'assets/svgs/moon_full.svg',
       showStars: false,
       cloudCount: 3,
-      cloudAssetPath: 'lottie/animated-background/cloud.json',
+      cloudAssetPath: 'assets/lottie/animated-background/cloud.json',
       weatherLayerAsset: null,
     );
   }

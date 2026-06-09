@@ -21,18 +21,15 @@ class ApollonWeatherProvider extends ChangeNotifier {
 
     // 2. Einen Timer setzen, der alle 30 Minuten neue Daten zieht.
     // So schonst du das API-Limit von Open-Meteo und dein Pi hat immer aktuelle Daten.
-    _timer = Timer.periodic(const Duration(minutes: 30), (_) {
+    _timer = Timer.periodic(const Duration(minutes: 3), (_) {
       loadWeather();
     });
   }
 
   Future<void> loadWeather() async {
-
     final newData = await _weatherService.fetchCurrentWeather();
-
     _weatherData = newData;
     _isLoading = false;
-
     // Sagt der Flutter-Engine: "Zeichne alle Widgets neu, die hierauf lauschen!"
     notifyListeners();
   }
