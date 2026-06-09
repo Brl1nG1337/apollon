@@ -64,9 +64,11 @@ class _ApollonAnimatedBackgroundState extends State<ApollonAnimatedBackground> {
             // EBENE 2a: Die dynamischen Wolken (Fliegen umher)
             // ==========================================
             if (weatherData.cloudAssetPath != null)
-              ApollonFlyingCloudsLayer(
-                cloudCount: weatherData.cloudCount,
-                cloudAssetPath: weatherData.cloudAssetPath!,
+              RepaintBoundary(
+                child: ApollonFlyingCloudsLayer(
+                  cloudCount: weatherData.cloudCount,
+                  cloudAssetPath: weatherData.cloudAssetPath!,
+                ),
               ),
 
             // ==========================================
