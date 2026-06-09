@@ -30,7 +30,7 @@ class _ApollonFlyingCloudsLayerState extends State<ApollonFlyingCloudsLayer> wit
     // Wolken-Eigenschaften generieren (Höhe, Größe, Geschwindigkeit)
     for (int i = 0; i < widget.cloudCount; i++) {
       _clouds.add(_CloudData(
-        topOffset: _rnd.nextDouble() * 150, // Wolken bleiben in den oberen 150 Pixeln
+        topOffset: _rnd.nextDouble() * 80, // Wolken bleiben in den oberen 150 Pixeln
         scale: 0.6 + (_rnd.nextDouble() * 0.6), // Größe zwischen 60% und 120%
         speedMultiplier: 0.5 + _rnd.nextDouble(), // Unterschiedliche Geschwindigkeiten
         startProgress: _rnd.nextDouble(), // Verteilt sie anfangs über den ganzen Bildschirm
