@@ -56,7 +56,7 @@ class _ApollonAnimatedBackgroundState extends State<ApollonAnimatedBackground> {
               left: celestialPos.left,
               top: celestialPos.top,
               child: weatherData.isDay
-                  ? Lottie.asset('lottie/sun.json', width: 90, height: 90)
+                  ? Lottie.asset('assets/lottie/sun.json', width: 90, height: 90)
                   : SvgPicture.asset(weatherData.moonPhaseAsset, width: 90, height: 90),
             ),
 

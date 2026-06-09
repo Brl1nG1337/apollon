@@ -21,19 +21,25 @@ class _ApollonFlyingCloudsLayerState extends State<ApollonFlyingCloudsLayer> wit
   final List<_CloudData> _clouds = [];
   final Random _rnd = Random();
 
+  // Wir speichern den exakten Startzeitpunkt der Animation
+  late DateTime _startTime;
+
   @override
   void initState() {
     super.initState();
-    // Ein Durchlauf dauert 60 Sekunden, läuft danach endlos weiter
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 60))..repeat();
+    _startTime = DateTime.now();
 
-    // Wolken-Eigenschaften generieren (Höhe, Größe, Geschwindigkeit)
+    // Der Controller muss nicht mehr 60 Sekunden laufen. Er dient nur noch als
+    // Frame-Trigger für den AnimatedBuilder. Eine Sekunde reicht völlig.
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 1))..repeat();
+
+    // Wolken-Eigenschaften generieren
     for (int i = 0; i < widget.cloudCount; i++) {
       _clouds.add(_CloudData(
-        topOffset: _rnd.nextDouble() * 80, // Wolken bleiben in den oberen 150 Pixeln
-        scale: 0.6 + (_rnd.nextDouble() * 0.6), // Größe zwischen 60% und 120%
-        speedMultiplier: 0.5 + _rnd.nextDouble(), // Unterschiedliche Geschwindigkeiten
-        startProgress: _rnd.nextDouble(), // Verteilt sie anfangs über den ganzen Bildschirm
+        topOffset: _rnd.nextDouble() * 80,
+        scale: 0.6 + (_rnd.nextDouble() * 0.6),
+        speedMultiplier: 0.7 + _rnd.nextDouble(),
+        startProgress: _rnd.nextDouble(),
       ));
     }
   }
@@ -51,13 +57,19 @@ class _ApollonFlyingCloudsLayerState extends State<ApollonFlyingCloudsLayer> wit
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
+        // Echte vergangene Zeit in Sekunden seit dem Start berechnen
+        final double elapsedSeconds = DateTime.now().difference(_startTime).inMilliseconds / 1000.0;
+
         return Stack(
           children: _clouds.map((cloud) {
             final screenWidth = MediaQuery.of(context).size.width;
-            final cloudWidth = 200.0 * cloud.scale;
+            final cloudWidth = 150.0 * cloud.scale;
 
-            // Berechnet die aktuelle X-Position (fliegt von rechts nach links)
-            double currentProgress = (cloud.startProgress + (_controller.value * cloud.speedMultiplier)) % 1.0;
+            // Basis-Dauer: Eine Wolke (Multiplier 1.0) braucht 60 Sekunden für einen Durchlauf.
+            // Durch die echte Zeit (% 1.0) gibt es nie wieder einen harten Reset!
+            double progressDelta = (elapsedSeconds / 60.0) * cloud.speedMultiplier;
+            double currentProgress = (cloud.startProgress + progressDelta) % 1.0;
+
             double xPos = screenWidth - (currentProgress * (screenWidth + cloudWidth));
 
             return Positioned(
