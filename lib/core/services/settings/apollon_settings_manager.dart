@@ -1,4 +1,4 @@
-import '../../model/apollon_settings_profile.dart';
+import '../../models/apollon_settings_profile.dart';
 
 class ApollonSettingsManager {
   // Singleton-Muster: Es gibt app-weit immer nur eine Instanz

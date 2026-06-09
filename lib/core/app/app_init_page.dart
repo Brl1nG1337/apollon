@@ -1,10 +1,11 @@
-import 'package:apollon/app/apollon_dashboard_page.dart';
 import 'package:apollon/core/widgets/common/apollon_page_container.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../core/services/settings/apollon_settings_manager.dart';
-import '../core/services/settings/apollon_settings_service.dart';
+import '../services/settings/apollon_settings_manager.dart';
+import '../services/settings/apollon_settings_service.dart';
+import 'apollon_dashboard_page.dart';
+
 
 class AppInitPage extends StatefulWidget {
   const AppInitPage({super.key});

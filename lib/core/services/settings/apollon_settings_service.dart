@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import '../../model/apollon_setting.dart';
-import '../../model/apollon_settings_profile.dart';
+import '../../models/apollon_setting.dart';
+import '../../models/apollon_settings_profile.dart';
 
 class ApollonSettingsService {
   // Ersetze die IP mit der deines Raspberry Pi / Spring Boot Backends.

@@ -1,7 +1,8 @@
-import 'package:apollon/app/apollon_settings_page.dart';
 import 'package:apollon/core/widgets/dahsboard/dashboard_widget_container.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../../app/apollon_settings_page.dart';
 
 class DashboardSettingsWidget extends StatelessWidget {
   const DashboardSettingsWidget({super.key});

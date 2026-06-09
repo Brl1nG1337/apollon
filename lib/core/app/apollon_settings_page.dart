@@ -5,12 +5,12 @@ import 'package:apollon/core/widgets/common/list/apollon_text_icon_selection_lis
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../core/model/apollon_setting.dart';
-import '../core/model/apollon_settings_category.dart';
-import '../core/model/enums/settings/apollon_setting_type.dart';
-import '../core/services/settings/apollon_settings_manager.dart';
-import '../core/services/settings/apollon_settings_service.dart';
-import '../core/widgets/common/apollon_basic_app_bar.dart';
+import '../models/apollon_setting.dart';
+import '../models/apollon_settings_category.dart';
+import '../models/enums/settings/apollon_setting_type.dart';
+import '../services/settings/apollon_settings_manager.dart';
+import '../services/settings/apollon_settings_service.dart';
+import '../widgets/common/apollon_basic_app_bar.dart';
 
 class ApollonSettingsPage extends StatefulWidget {
   const ApollonSettingsPage({super.key});
