@@ -64,13 +64,13 @@ class ApollonLayeredWeatherResult {
   }) {
     final progress = customProgress ?? celestialProgress;
 
-    // Mittelpunkt der Ellipse auf dem Horizont (y = 240 bei 480px Höhe)
+    // Mittelpunkt der Ellipse (y etwas höher, damit sie über den Header geht)
     final double cx = displayWidth / 2;
-    final double cy = displayHeight / 1.8;
+    final double cy = displayHeight / 2; // 60px nach oben verschoben
 
     // Radien für die elliptische Bahn
-    final double rx = displayWidth / 2.3; // Deckt die gesamte Breite ab
-    final double ry = cy * 0.85; // Steigt bis knapp unter den oberen Rand
+    final double rx = (displayWidth / 2) - (displayWidth*.1);
+    final double ry = (displayHeight / 2) - (displayHeight*.1); // Mehr vertikaler Spielraum
 
     // Theta von 0 bis PI für einen Halbkreis/Halbellipse
     final double theta = pi * progress;

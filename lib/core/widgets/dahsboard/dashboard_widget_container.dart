@@ -20,8 +20,8 @@ class DashboardWidgetContainer extends StatelessWidget {
       borderRadius: BorderRadius.circular(28),
       child: BackdropFilter(
         filter: ImageFilter.blur(
-          sigmaX: 20,
-          sigmaY: 20,
+          sigmaX: 25,
+          sigmaY: 50,
         ),
         child: Material(
           color: Colors.transparent,
@@ -31,16 +31,16 @@ class DashboardWidgetContainer extends StatelessWidget {
               padding: padding,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
-                color: Colors.white.withOpacity(0.12),
+                color: Colors.black.withOpacity(0.20), // Dunklerer Hintergrund für besseren Textkontrast
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.25),
+                  color: Colors.white.withOpacity(0.15),
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 25,
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),

@@ -21,37 +21,36 @@ class _ApollonDashboardHeaderState extends State<ApollonDashboardHeader> {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
     return Container(
       width: double.infinity,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      // Zentrierter Container für Uhrzeit und Datum
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          Expanded(
-            child: StreamBuilder<DateTime>(
-              stream: _timeStream,
-              initialData: DateTime.now(),
-              builder: (context, snapshot) {
-                final now = snapshot.data!;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          StreamBuilder<DateTime>(
+            stream: _timeStream,
+            initialData: DateTime.now(),
+            builder: (context, snapshot) {
+              final now = snapshot.data!;
+              return Padding(
+                padding: const EdgeInsets.only(top: 48),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       child: Text(
                         DateFormat('HH:mm').format(now),
                         style: GoogleFonts.audiowide(
-                          fontSize: 84,
-                          fontWeight: FontWeight.w400,
-                          color: colors.onSurface,
+                          fontSize: 96,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
                           height: 1,
                           shadows: [
                             Shadow(
-                              color: colors.primary.withOpacity(0.3),
+                              color: Colors.black.withOpacity(0.8),
                               blurRadius: 15,
-                              offset: const Offset(0, 0),
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
@@ -61,37 +60,45 @@ class _ApollonDashboardHeaderState extends State<ApollonDashboardHeader> {
                     Text(
                       DateFormat('EEEE, d. MMMM yyyy', 'de_DE').format(now),
                       style: GoogleFonts.plusJakartaSans(
-                        fontSize: 16,
-                        color: colors.onSurface.withOpacity(0.7),
-                        fontWeight: FontWeight.w400,
-                        letterSpacing: 0.5,
+                        fontSize: 18,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.0,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withOpacity(0.8),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
-
-          const SizedBox(width: 20),
-
-          // Settings Icon
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withOpacity(0.15)),
-            ),
-            child: InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ApollonSettingsPage()),
-                );
-              },
-              child: const Icon(Icons.settings_outlined, color: Colors.white, size: 22),
+          
+          // Settings Icon (am rechten Rand)
+          Positioned(
+            right: 0,
+            top: 0,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white.withOpacity(0.2)),
+              ),
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ApollonSettingsPage()),
+                  );
+                },
+                child: const Icon(Icons.settings_outlined, color: Colors.white, size: 24),
+              ),
             ),
           ),
         ],

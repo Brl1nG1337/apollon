@@ -23,9 +23,16 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
         }
 
         final data = weatherProv.weatherData!;
+        final textShadow = [
+          const Shadow(
+            color: Colors.black,
+            blurRadius: 4,
+            offset: Offset(0, 1),
+          ),
+        ];
 
         return DashboardWidgetContainer(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -33,8 +40,8 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
               Row(
                 children: [
                   SizedBox(
-                    width: 24,
-                    height: 24,
+                    width: 36,
+                    height: 32,
                     child: Lottie.asset(
                       _getWmoLottie(data.weatherCode, data.isDay),
                       fit: BoxFit.contain,
@@ -43,18 +50,18 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Außenklima',
-                      style: GoogleFonts.plusJakartaSans(
+                      'Wetter',
+                      style: GoogleFonts.audiowide(
                         color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        shadows: textShadow,
                       ),
                     ),
                   ),
                 ],
               ),
-
-              const Spacer(flex: 1),
+              const Spacer(),
 
               // Aktuelle Temperatur Row
               Row(
@@ -66,13 +73,14 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
                       '${data.currentTemp.round()}°',
                       style: GoogleFonts.plusJakartaSans(
                         color: Colors.white,
-                        fontSize: 48,
-                        fontWeight: FontWeight.w500,
+                        fontSize: 54,
+                        fontWeight: FontWeight.w700,
                         height: 1,
+                        shadows: textShadow,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,17 +88,20 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
                         Text(
                           _getWmoDescription(data.weatherCode),
                           style: GoogleFonts.plusJakartaSans(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            shadows: textShadow,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
                           'Regen: ${data.precipitationProbability}%',
                           style: GoogleFonts.plusJakartaSans(
-                            color: Colors.white.withOpacity(0.6),
-                            fontSize: 10,
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            shadows: textShadow,
                           ),
                         ),
                       ],
@@ -98,16 +109,15 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
                   ),
                 ],
               ),
-
-              const Spacer(flex: 1),
-              Divider(color: Colors.white.withOpacity(0.1), thickness: 1, height: 1),
-              const SizedBox(height: 8),
+              const SizedBox(height: 8,),
+              Divider(color: Colors.white.withOpacity(0.2), thickness: 1, height: 1),
+              const SizedBox(height: 10),
 
               // Forecast Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: data.hourlyForecast
-                    .map((item) => _buildForecastItem(item))
+                    .map((item) => _buildForecastItem(item, textShadow))
                     .toList(),
               ),
             ],
@@ -117,7 +127,7 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildForecastItem(HourlyForecast item) {
+  Widget _buildForecastItem(HourlyForecast item, List<Shadow> shadow) {
     final hour = item.time.hour.toString().padLeft(2, '0');
     final isDay = item.time.hour >= 6 && item.time.hour < 21;
 
@@ -126,26 +136,27 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
         Text(
           '$hour:00',
           style: GoogleFonts.plusJakartaSans(
-            color: Colors.white.withOpacity(0.5),
-            fontSize: 9,
+            color: Colors.white.withOpacity(0.8),
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            shadows: shadow,
           ),
         ),
-        const SizedBox(height: 4),
         SizedBox(
-          width: 24,
-          height: 24,
+          width: 32,
+          height: 32,
           child: Lottie.asset(
             _getWmoLottie(item.weatherCode, isDay),
             fit: BoxFit.contain,
           ),
         ),
-        const SizedBox(height: 4),
         Text(
           '${item.temperature.round()}°',
           style: GoogleFonts.plusJakartaSans(
             color: Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            shadows: shadow,
           ),
         ),
       ],

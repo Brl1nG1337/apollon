@@ -21,11 +21,8 @@ class _ApollonAnimatedBackgroundState extends State<ApollonAnimatedBackground> {
   @override
   void initState() {
     super.initState();
-    // Refresh alle 1 Sekunde für flüssige Bewegungen
     _refreshTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (mounted) {
-        setState(() {});
-      }
+      if (mounted) setState(() {});
     });
   }
 
@@ -46,35 +43,40 @@ class _ApollonAnimatedBackgroundState extends State<ApollonAnimatedBackground> {
         final data = weatherProv.weatherData!;
         final now = DateTime.now();
         final progress = data.calculateCurrentProgress(now);
+        // Bahn leicht nach oben verschoben (y-referenz auf 400 statt 480), damit sie nicht in die Widgets läuft
         final celestialPos = data.getPosition(800, 480, customProgress: progress).toOffset();
 
         final bool isRainy = data.weatherCode >= 61 && data.weatherCode <= 99;
         
         return Stack(
           children: [
-            // 1. Atmos-Sky
-            _NaturalSky(
+            // 1. Der "Deep Space" Himmel (Viel weicherer Übergang)
+            _AtmosphericSky(
               progress: progress,
               isDay: data.isDay,
               celestialPos: celestialPos,
               isRainy: isRainy,
             ),
 
-            // 2. Himmelskörper
+            // 2. Himmelskörper mit eigenem Glow
             Positioned(
-              left: celestialPos.dx - 45,
-              top: celestialPos.dy - 45,
-              child: data.isDay
-                  ? Lottie.asset('assets/lottie/sun.json', width: 90, height: 90)
-                  : SvgPicture.asset(data.moonPhaseAsset, width: 90, height: 90),
+              left: celestialPos.dx - 60,
+              top: celestialPos.dy - 60,
+              child: _CelestialBody(
+                isDay: data.isDay,
+                moonAsset: data.moonPhaseAsset,
+              ),
             ),
 
-            // 3. Wolken
+            // 3. Wolken (dezenter im Hintergrund)
             if (data.cloudAssetPath != null)
-              RepaintBoundary(
-                child: ApollonFlyingCloudsLayer(
-                  cloudCount: data.cloudCount,
-                  cloudAssetPath: data.cloudAssetPath!,
+              Opacity(
+                opacity: 0.6,
+                child: RepaintBoundary(
+                  child: ApollonFlyingCloudsLayer(
+                    cloudCount: data.cloudCount,
+                    cloudAssetPath: data.cloudAssetPath!,
+                  ),
                 ),
               ),
 
@@ -82,7 +84,7 @@ class _ApollonAnimatedBackgroundState extends State<ApollonAnimatedBackground> {
             if (data.weatherLayerAsset != null)
               Positioned.fill(
                 child: Opacity(
-                  opacity: 0.4,
+                  opacity: 0.3,
                   child: Lottie.asset(data.weatherLayerAsset!, fit: BoxFit.cover),
                 ),
               ),
@@ -93,13 +95,13 @@ class _ApollonAnimatedBackgroundState extends State<ApollonAnimatedBackground> {
   }
 }
 
-class _NaturalSky extends StatelessWidget {
+class _AtmosphericSky extends StatelessWidget {
   final double progress;
   final bool isDay;
   final Offset celestialPos;
   final bool isRainy;
 
-  const _NaturalSky({
+  const _AtmosphericSky({
     required this.progress,
     required this.isDay,
     required this.celestialPos,
@@ -108,25 +110,34 @@ class _NaturalSky extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final skyColors = _getSkyBaseColors();
+    final baseColors = _getSkyBaseColors();
     final horizonColor = _getHorizonColor();
 
     return Stack(
       children: [
-        // LAYER 1: Basis-Himmel
+        // Ebene 1: Basis-Gradient (Vertikal, viele Stops gegen Banding)
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: skyColors,
-              stops: const [0.0, 0.7, 1.0],
+              colors: [
+                baseColors[0],
+                baseColors[1],
+                baseColors[2],
+                baseColors[2].withOpacity(0.8),
+              ],
+              stops: const [0.0, 0.4, 0.8, 1.0],
             ),
           ),
         ),
 
-        // LAYER 2: Horizon-Glow
-        Positioned.fill(
+        // Ebene 2: Horizon Glow (Weicher Nebel am unteren Rand)
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 300,
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -134,104 +145,97 @@ class _NaturalSky extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: [
                   Colors.transparent,
-                  horizonColor.withOpacity(isDay ? 0.4 : 0.1),
-                  horizonColor.withOpacity(isDay ? 0.6 : 0.2),
-                ],
-                stops: const [0.3, 0.5, 1.0],
-              ),
-            ),
-          ),
-        ),
-
-        // LAYER 3: Sun/Moon Glow
-        Positioned.fill(
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: RadialGradient(
-                center: Alignment(
-                  (celestialPos.dx / 400) - 1.0,
-                  (celestialPos.dy / 240) - 1.0,
-                ),
-                radius: 2.0,
-                colors: [
-                  (isDay ? Colors.orange.shade300 : Colors.blue.shade100)
-                      .withOpacity(isDay ? 0.2 : 0.05),
-                  Colors.transparent,
+                  horizonColor.withOpacity(isDay ? 0.3 : 0.1),
+                  horizonColor.withOpacity(isDay ? 0.8 : 0.2),
                 ],
               ),
             ),
           ),
         ),
 
-        // LAYER 4: Regen
-        if (isRainy)
-          Positioned.fill(
-            child: Container(
-              color: Colors.indigo.withOpacity(0.3),
-            ),
-          ),
-
-        // LAYER 5: Vignette
+        // Ebene 3: Globaler Licht-Diffusor (Folgt dem Sonnenstand horizontal)
         Positioned.fill(
           child: Container(
             decoration: BoxDecoration(
               gradient: RadialGradient(
+                center: Alignment((celestialPos.dx / 400) - 1.0, 0.2), // Fixiert auf Horizonthöhe
                 radius: 1.5,
                 colors: [
+                  horizonColor.withOpacity(isDay ? 0.2 : 0.05),
                   Colors.transparent,
-                  Colors.black.withOpacity(0.3),
                 ],
               ),
             ),
           ),
         ),
+
+        if (isRainy)
+          Positioned.fill(
+            child: Container(color: Colors.blueGrey.withOpacity(0.3)),
+          ),
       ],
     );
   }
 
   List<Color> _getSkyBaseColors() {
     if (!isDay) {
-      return [
-        const Color(0xFF010208),
-        const Color(0xFF050A1A),
-        const Color(0xFF0B1026),
-      ];
+      return [const Color(0xFF010409), const Color(0xFF080E1C), const Color(0xFF0B1026)];
     }
-
+    
+    // Tag-Farbpalette (Satter & Natürlicher)
     if (progress < 0.2) {
-      final t = (progress / 0.2);
+      final t = progress / 0.2;
       return [
-        Color.lerp(const Color(0xFF0B1026), Colors.blue.shade900, t)!,
-        Color.lerp(const Color(0xFF1E3C72), Colors.lightBlue.shade700, t)!,
-        Color.lerp(const Color(0xFF2A5298), Colors.lightBlue.shade400, t)!,
+        Color.lerp(const Color(0xFF020510), const Color(0xFF0D1B3E), t)!,
+        Color.lerp(const Color(0xFF1E3C72), const Color(0xFF2A5298), t)!,
+        Color.lerp(const Color(0xFF2A5298), Colors.lightBlue.shade600, t)!,
       ];
     } else if (progress > 0.8) {
-      final t = ((progress - 0.8) / 0.2);
+      final t = (progress - 0.8) / 0.2;
       return [
-        Color.lerp(Colors.blue.shade900, const Color(0xFF0B1026), t)!,
-        Color.lerp(Colors.lightBlue.shade700, const Color(0xFF1B2755), t)!,
-        Color.lerp(Colors.lightBlue.shade400, const Color(0xFF2A5298), t)!,
+        Color.lerp(const Color(0xFF0D1B3E), const Color(0xFF020510), t)!,
+        Color.lerp(const Color(0xFF2A5298), const Color(0xFF1E3C72), t)!,
+        Color.lerp(Colors.lightBlue.shade600, const Color(0xFF2A5298), t)!,
       ];
     } else {
-      return [
-        Colors.blue.shade900,
-        Colors.lightBlue.shade700,
-        Colors.lightBlue.shade400,
-      ];
+      return [const Color(0xFF0D1B3E), const Color(0xFF1E3C72), const Color(0xFF2A5298)];
     }
   }
 
   Color _getHorizonColor() {
     if (!isDay) return const Color(0xFF1B2755);
+    if (progress < 0.15) return const Color(0xFFFF8C00); // Goldener Aufgang
+    if (progress > 0.85) return const Color(0xFFFF4500); // Roter Untergang
+    return Colors.lightBlue.shade100;
+  }
+}
 
-    if (progress < 0.15) {
-      final t = (progress / 0.15);
-      return Color.lerp(const Color(0xFFF12711), const Color(0xFFF5AF19), t)!;
-    } else if (progress > 0.85) {
-      final t = ((progress - 0.85) / 0.15);
-      return Color.lerp(const Color(0xFFF5AF19), const Color(0xFFE44D26), t)!;
-    } else {
-      return Colors.lightBlue.shade200;
-    }
+class _CelestialBody extends StatelessWidget {
+  final bool isDay;
+  final String moonAsset;
+
+  const _CelestialBody({required this.isDay, required this.moonAsset});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 80,
+      height: 80,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: (isDay ? Colors.orange : Colors.blue).withOpacity(0.3),
+            blurRadius: 65,
+            spreadRadius: 30,
+          ),
+        ],
+      ),
+      child: Center(
+        child: isDay
+            ? Lottie.asset('assets/lottie/sun.json', width: 80, height: 80)
+            : SvgPicture.asset(moonAsset, width: 80, height: 80),
+      ),
+    );
   }
 }
