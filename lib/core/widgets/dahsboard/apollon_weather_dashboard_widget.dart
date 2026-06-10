@@ -175,7 +175,7 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
   }
 
   String _getWmoLottie(int code, bool isDay) {
-    const base = 'lottie/';
+    const base = 'assets/lottie/';
     if (code == 0) {
       return isDay ? '${base}clear-day.json' : '${base}clear-night.json';
     }
