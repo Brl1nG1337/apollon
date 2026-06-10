@@ -1,7 +1,13 @@
-import 'package:apollon/core/widgets/common/apollon_animated_background.dart';
-import 'package:apollon/core/widgets/common/apollon_page_container.dart';
+import 'dart:async';
+
+import 'package:apollon/core/widgets/dahsboard/apollon_dashboard_header.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import '../widgets/common/apollon_animated_background.dart';
+import '../widgets/common/apollon_page_container.dart';
+import '../widgets/dahsboard/apollon_devices_dashboard_widget.dart';
+import '../widgets/dahsboard/apollon_env_dashboard_widget.dart';
+import '../widgets/dahsboard/apollon_weather_dashboard_widget.dart';
 
 class ApollonDashboardPage extends StatefulWidget {
   const ApollonDashboardPage({super.key});
@@ -11,16 +17,15 @@ class ApollonDashboardPage extends StatefulWidget {
 }
 
 class _ApollonDashboardPageState extends State<ApollonDashboardPage> {
-  // 1. Controller für die PageView hinzufügen
-  final PageController _pageController = PageController();
-
-  // 2. Zustand für den aktuellen Index speichern
-  int _currentPage = 0;
+  late Stream<DateTime> _timeStream;
 
   @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    _timeStream = Stream.periodic(
+      const Duration(seconds: 1),
+      (_) => DateTime.now(),
+    );
   }
 
   @override
@@ -29,34 +34,37 @@ class _ApollonDashboardPageState extends State<ApollonDashboardPage> {
       body: ApollonPageContainer(
         child: Stack(
           children: [
-            ApollonAnimatedBackground(),
-            Positioned(
-              bottom: 20,
-              left: 20,
-              child: Text(
-                _getGreeting(),
-                style: GoogleFonts.audiowide(
-                  fontSize: 48,
-                  color: Theme.of(context).colorScheme.surface,
-                ),
+            // EBENE 0: Der dynamische Wetterhintergrund
+            const ApollonAnimatedBackground(),
+
+            // EBENE 1: UI Content
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // --- HEADER: Uhrzeit, Datum & Settings ---
+                  ApollonDashboardHeader(),
+                  const Spacer(),
+                  Container(
+                    width: double.infinity,
+                    height: 220,
+                    child: Row(
+                      children: [
+                        Expanded(flex: 1,child: ApollonWeatherDashboardWidget()),
+                        const SizedBox(width: 16,),
+                        Expanded(flex: 1, child: Placeholder()),
+                        const SizedBox(width: 16,),
+                        Expanded(flex: 1, child: Placeholder()),
+                      ],
+                    ),
+                  )
+                ],
               ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  String _getGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour >= 6 && hour < 12) {
-      return "Guten Morgen, Basti!";
-    } else if (hour >= 12 && hour < 18) {
-      return "Guten Tag, Basti!";
-    } else if (hour >= 18 && hour < 23) {
-      return "Guten Abend, Basti!";
-    } else {
-      return "Hallo, Basti!";
-    }
   }
 }

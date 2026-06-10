@@ -20,8 +20,7 @@ class ApollonWeatherProvider extends ChangeNotifier {
     loadWeather();
 
     // 2. Einen Timer setzen, der alle 30 Minuten neue Daten zieht.
-    // So schonst du das API-Limit von Open-Meteo und dein Pi hat immer aktuelle Daten.
-    _timer = Timer.periodic(const Duration(seconds: 30), (_) {
+    _timer = Timer.periodic(const Duration(minutes: 30), (_) {
       loadWeather();
     });
   }

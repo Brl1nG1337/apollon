@@ -1,41 +1,54 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
-class DashboardWidgetContainer extends StatefulWidget {
+class DashboardWidgetContainer extends StatelessWidget {
   final Widget child;
-  final bool isLoading; // NEU: Flag für den Ladestatus
+  final EdgeInsets padding;
+  final VoidCallback? onTap;
 
   const DashboardWidgetContainer({
     super.key,
     required this.child,
-    this.isLoading = false, // Standardmäßig false, damit bestehende Widgets nicht brechen
+    this.padding = const EdgeInsets.all(24),
+    this.onTap,
   });
 
   @override
-  State<DashboardWidgetContainer> createState() => _DashboardWidgetContainerState();
-}
-
-class _DashboardWidgetContainerState extends State<DashboardWidgetContainer> {
-  @override
   Widget build(BuildContext context) {
-    var colors = Theme.of(context).colorScheme;
-
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: colors.primary.withAlpha(35),
-        borderRadius: const BorderRadius.all(Radius.circular(16)),
-        border: Border.all(color: colors.tertiary.withAlpha(80), width: 4),
-      ),
-      child: widget.isLoading
-          ? Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(colors.primary),
-          strokeWidth: 4,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(
+          sigmaX: 20,
+          sigmaY: 20,
         ),
-      )
-          : widget.child,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            child: Container(
+              padding: padding,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                color: Colors.white.withOpacity(0.12),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.25),
+                  width: 1.5,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: child,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

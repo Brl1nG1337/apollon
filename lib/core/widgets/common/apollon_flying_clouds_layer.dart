@@ -23,8 +23,6 @@ class _ApollonFlyingCloudsLayerState extends State<ApollonFlyingCloudsLayer>
   late AnimationController _controller;
   final List<_CloudData> _clouds = [];
   final Random _rnd = Random();
-
-  // Wir speichern den exakten Startzeitpunkt der Animation
   late DateTime _startTime;
 
   @override
@@ -32,21 +30,38 @@ class _ApollonFlyingCloudsLayerState extends State<ApollonFlyingCloudsLayer>
     super.initState();
     _startTime = DateTime.now();
 
-    // Der Controller muss nicht mehr 60 Sekunden laufen. Er dient nur noch als
-    // Frame-Trigger für den AnimatedBuilder. Eine Sekunde reicht völlig.
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1),
     )..repeat();
 
-    // Wolken-Eigenschaften generieren
+    _generateClouds();
+  }
+
+  @override
+  void didUpdateWidget(ApollonFlyingCloudsLayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Falls sich die Anzahl der Wolken massiv ändert (z.B. Wetterumschwung), 
+    // generieren wir sie neu, aber behalten den Startzeitpunkt bei.
+    if (oldWidget.cloudCount != widget.cloudCount) {
+      _generateClouds();
+    }
+  }
+
+  void _generateClouds() {
+    _clouds.clear();
     for (int i = 0; i < widget.cloudCount; i++) {
+      final double scale = 0.3 + (_rnd.nextDouble() * 0.5); // Deutlich kleinere Skalierung
       _clouds.add(
         _CloudData(
-          topOffset: _rnd.nextDouble() * 80,
-          scale: 0.6 + (_rnd.nextDouble() * 0.6),
-          speedMultiplier: 0.7 + _rnd.nextDouble(),
+          topOffset: _rnd.nextDouble() * 100, // Etwas kompakterer Bereich
+          scale: scale,
+          // Parallax-Effekt: Große Wolken (vorne) bewegen sich schneller
+          speedMultiplier: (0.7 + _rnd.nextDouble() * 0.5) * (scale + 0.5),
           startProgress: _rnd.nextDouble(),
+          opacity: 0.2 + (_rnd.nextDouble() * 0.5), // Etwas dezentere Transparenz
+          driftPhase: _rnd.nextDouble() * pi * 2,
+          driftIntensity: 3.0 + (_rnd.nextDouble() * 10.0), // Weniger vertikaler Drift
         ),
       );
     }
@@ -65,28 +80,38 @@ class _ApollonFlyingCloudsLayerState extends State<ApollonFlyingCloudsLayer>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        // Echte vergangene Zeit in Sekunden seit dem Start berechnen
         final double elapsedSeconds =
             DateTime.now().difference(_startTime).inMilliseconds / 1000.0;
 
         return Stack(
           children: _clouds.map((cloud) {
-            final screenWidth = MediaQuery.of(context).size.width;
-            final cloudWidth = 150.0 * cloud.scale;
-            double progressDelta =
-                (elapsedSeconds / 60.0) * cloud.speedMultiplier;
-            double currentProgress =
-                (cloud.startProgress + progressDelta) % 1.0;
+            final screenWidth = 800.0; // Feste Referenzbreite
+            final cloudWidth = 140.0 * cloud.scale; // Reduzierte Basisbreite
+            
+            // Horizontale Position mit Zeit-Fortschritt (Divisor von 80 auf 50 reduziert für mehr Speed)
+            double progressDelta = (elapsedSeconds / 50.0) * cloud.speedMultiplier;
+            double currentProgress = (cloud.startProgress + progressDelta) % 1.0;
+            double xPos = screenWidth - (currentProgress * (screenWidth + cloudWidth));
 
-            double xPos =
-                screenWidth - (currentProgress * (screenWidth + cloudWidth));
+            // Vertikaler Drift (Sinus-Welle für organisches Schweben)
+            double drift = sin((elapsedSeconds * 0.5) + cloud.driftPhase) * cloud.driftIntensity;
 
             return Positioned(
-              top: cloud.topOffset,
+              top: cloud.topOffset + drift,
               left: xPos,
-              child: SizedBox(
-                width: cloudWidth,
-                child: Opacity(opacity: .8,child: Lottie.asset(widget.cloudAssetPath)),
+              child: Transform.scale(
+                scale: cloud.scale,
+                child: Opacity(
+                  opacity: cloud.opacity,
+                  child: SizedBox(
+                    width: 140, // Reduzierte Basisbreite
+                    child: Lottie.asset(
+                      widget.cloudAssetPath,
+                      // Wir verlangsamen die interne Lottie-Animation leicht für mehr Ruhe
+                      repeat: true,
+                    ),
+                  ),
+                ),
               ),
             );
           }).toList(),
@@ -101,11 +126,17 @@ class _CloudData {
   final double scale;
   final double speedMultiplier;
   final double startProgress;
+  final double opacity;
+  final double driftPhase;
+  final double driftIntensity;
 
   _CloudData({
     required this.topOffset,
     required this.scale,
     required this.speedMultiplier,
     required this.startProgress,
+    required this.opacity,
+    required this.driftPhase,
+    required this.driftIntensity,
   });
 }

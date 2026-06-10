@@ -2,6 +2,17 @@ import 'dart:math';
 
 import 'package:apollon/core/models/weather/apollon_celestial_position.dart';
 
+class HourlyForecast {
+  final DateTime time;
+  final int weatherCode;
+  final double temperature;
+
+  HourlyForecast({
+    required this.time,
+    required this.weatherCode,
+    required this.temperature,
+  });
+}
 
 class ApollonLayeredWeatherResult {
   final bool isDay;
@@ -10,9 +21,22 @@ class ApollonLayeredWeatherResult {
   final bool showStars;
 
   // --- NEU: Wolken & Wetter ---
-  final int cloudCount;           // 0 bis z.B. 6
-  final String? cloudAssetPath;   // cloud.json oder dark cloud.json
-  final String? weatherLayerAsset;// rain_overlay, snow_overlay, dark cloud lightning
+  final int cloudCount; // 0 bis z.B. 6
+  final String? cloudAssetPath; // cloud.json oder dark cloud.json
+  final String?
+      weatherLayerAsset; // rain_overlay, snow_overlay, dark cloud lightning
+
+  // --- NEU für Dashboard Widget ---
+  final double currentTemp;
+  final int weatherCode;
+  final double humidity;
+  final double windSpeed;
+  final int precipitationProbability;
+  final List<HourlyForecast> hourlyForecast;
+
+  // --- NEU: Astronomie-Basisdaten ---
+  final DateTime sunrise;
+  final DateTime sunset;
 
   ApollonLayeredWeatherResult({
     required this.isDay,
@@ -22,14 +46,64 @@ class ApollonLayeredWeatherResult {
     required this.cloudCount,
     this.cloudAssetPath,
     this.weatherLayerAsset,
+    required this.currentTemp,
+    required this.weatherCode,
+    required this.humidity,
+    required this.windSpeed,
+    required this.precipitationProbability,
+    required this.hourlyForecast,
+    required this.sunrise,
+    required this.sunset,
   });
 
-  ApollonCelestialPosition getPosition(double displayWidth, double baseHeight) {
-    double radius = displayWidth / 2.2;
-    double theta = pi * celestialProgress;
+  /// Berechnet die Position basierend auf dem aktuellen Fortschritt (0.0 bis 1.0)
+  ApollonCelestialPosition getPosition(
+    double displayWidth,
+    double displayHeight, {
+    double? customProgress,
+  }) {
+    final progress = customProgress ?? celestialProgress;
+
+    // Mittelpunkt der Ellipse auf dem Horizont (y = 240 bei 480px Höhe)
+    final double cx = displayWidth / 2;
+    final double cy = displayHeight / 1.8;
+
+    // Radien für die elliptische Bahn
+    final double rx = displayWidth / 2.3; // Deckt die gesamte Breite ab
+    final double ry = cy * 0.85; // Steigt bis knapp unter den oberen Rand
+
+    // Theta von 0 bis PI für einen Halbkreis/Halbellipse
+    final double theta = pi * progress;
+
+    // x = cx - rx * cos(theta) -> startet links (0.0) und endet rechts (1.0)
+    // y = cy - ry * sin(theta) -> startet auf Horizont, steigt auf Peak, endet auf Horizont
     return ApollonCelestialPosition(
-      radius - (radius * cos(theta)),
-      baseHeight - (radius * sin(theta)),
+      cx - (rx * cos(theta)),
+      cy - (ry * sin(theta)),
     );
+  }
+
+  /// Berechnet den aktuellen Fortschritt (0.0 bis 1.0) für Sonne/Mond dynamisch
+  double calculateCurrentProgress(DateTime now) {
+    if (now.isAfter(sunrise) && now.isBefore(sunset)) {
+      // TAG: Fortschritt von Sunrise bis Sunset
+      final total = sunset.difference(sunrise).inSeconds;
+      final passed = now.difference(sunrise).inSeconds;
+      return (passed / total).clamp(0.0, 1.0);
+    } else {
+      // NACHT: Fortschritt von Sunset bis Sunrise (nächster Tag)
+      DateTime start = sunset;
+      DateTime end = sunrise;
+
+      if (now.isAfter(sunset)) {
+        end = sunrise.add(const Duration(days: 1));
+      } else {
+        start = sunset.subtract(const Duration(days: 1));
+      }
+
+      final total = end.difference(start).inSeconds;
+      final passed = now.difference(start).inSeconds;
+      return (passed / total).clamp(0.0, 1.0);
+    }
   }
 }

@@ -7,13 +7,21 @@ class ApollonPageContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Container(
-        width: 800,
-        height: 480,
-        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface),
-        child: child,
+    return Container(
+      color: Theme.of(context).colorScheme.surface,
+      child: Center(
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: Container(
+            width: 800,
+            height: 480,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+            ),
+            child: child,
+          ),
+        ),
       ),
     );
   }

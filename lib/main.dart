@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -11,9 +12,10 @@ import 'core/providers/apollon_weather_provider.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (!kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS)) {
-    WidgetsFlutterBinding.ensureInitialized();
+  // Initialisiere Datumsformate für Deutsch
+  await initializeDateFormatting('de_DE', null);
 
+  if (!kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS)) {
     await windowManager.ensureInitialized();
 
     const options = WindowOptions(fullScreen: true);
@@ -43,38 +45,28 @@ class ApollonApplication extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-
-        // Das ColorScheme exakt nach deinen Vorgaben
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFFFFB000),
           primary: const Color(0xFFFFB000),
           secondary: const Color(0xFFFF7A00),
           tertiary: const Color(0xFFFFD166),
-          surface: const Color(0xFF100A00), // Tiefes, warmes Schwarz/Braun
-          onSurface: const Color(0xFFFFD89A), // Gut lesbarer, warmer Textton
+          surface: const Color(0xFF100A00),
+          onSurface: const Color(0xFFFFD89A),
           brightness: Brightness.dark,
         ),
-
-        // Spezifische Anpassungen für Dashboard-Komponenten:
-
-        // 1. Cards (für deine Sensor-Kacheln, Raum-Buttons etc.)
         cardTheme: const CardThemeData(
-          color: Color(0x1AFFFFFF), // Minimal transparentes Weiß (ca. 10% Deckkraft)
+          color: Color(0x1AFFFFFF),
           elevation: 0,
           margin: EdgeInsets.all(8),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
         ),
-
-        // 2. Textelemente (Knackig und gut lesbar auf Distanz)
         textTheme: const TextTheme(
           displayLarge: TextStyle(color: Color(0xFFFFD89A), fontWeight: FontWeight.bold),
           bodyLarge: TextStyle(color: Color(0xFFFFD89A)),
-          bodyMedium: TextStyle(color: Color(0xB3FFD89A)), // 70% Deckkraft für sekundäre Infos
+          bodyMedium: TextStyle(color: Color(0xB3FFD89A)),
         ),
-
-        // 3. Icons (Nutzen standardmäßig deinen edlen Amber-Ton)
         iconTheme: const IconThemeData(
           color: Color(0xFFFFB000),
           size: 24,
