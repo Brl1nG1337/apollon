@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -45,6 +46,12 @@ class _ApollonAnimatedBackgroundState extends State<ApollonAnimatedBackground> {
         final progress = data.calculateCurrentProgress(now);
         final celestialPos = data.getPosition(800, 480, customProgress: progress).toOffset();
 
+        // Dynamische Größe berechnen (sinus-kurve: 0.0 -> klein, 0.5 -> groß, 1.0 -> klein)
+        // Wir skalieren von ca. 80px auf 140px
+        final double baseSize = 80;
+        final double extraSize = 60 * sin(progress * pi);
+        final double currentSize = baseSize + extraSize;
+
         final bool isRainy = data.weatherCode >= 61 && data.weatherCode <= 99;
         
         return Stack(
@@ -57,14 +64,15 @@ class _ApollonAnimatedBackgroundState extends State<ApollonAnimatedBackground> {
               isRainy: isRainy,
             ),
 
-            // 2. Himmelskörper
+            // 2. Himmelskörper (Zentriert durch Offset der halben Größe)
             Positioned(
-              left: celestialPos.dx - 60,
-              top: celestialPos.dy - 60,
+              left: celestialPos.dx - (currentSize / 2),
+              top: celestialPos.dy - (currentSize / 2),
               child: _CelestialBody(
                 isDay: data.isDay,
                 moonAsset: data.moonPhaseAsset,
                 progress: progress,
+                size: currentSize,
               ),
             ),
 
@@ -232,11 +240,13 @@ class _CelestialBody extends StatelessWidget {
   final bool isDay;
   final String moonAsset;
   final double progress;
+  final double size;
 
   const _CelestialBody({
     required this.isDay,
     required this.moonAsset,
     required this.progress,
+    required this.size,
   });
 
   @override
@@ -252,27 +262,27 @@ class _CelestialBody extends StatelessWidget {
     }
 
     return Container(
-      width: 120,
-      height: 120,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
             color: glowColor.withValues(alpha: 0.3),
-            blurRadius: 70,
-            spreadRadius: 30,
+            blurRadius: size * 0.6,
+            spreadRadius: size * 0.25,
           ),
           BoxShadow(
             color: glowColor.withValues(alpha: 0.2),
-            blurRadius: 120,
-            spreadRadius: 50,
+            blurRadius: size * 1.0,
+            spreadRadius: size * 0.4,
           ),
         ],
       ),
       child: Center(
         child: isDay
-            ? Lottie.asset('assets/lottie/sun.json', width: 90, height: 90)
-            : SvgPicture.asset(moonAsset, width: 80, height: 80),
+            ? Lottie.asset('assets/lottie/sun.json', width: size * 0.8, height: size * 0.8)
+            : SvgPicture.asset(moonAsset, width: size * 0.7, height: size * 0.7),
       ),
     );
   }

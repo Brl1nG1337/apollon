@@ -37,7 +37,7 @@ class _ApollonDashboardPageState extends State<ApollonDashboardPage> {
 
             // EBENE 1: UI Content
             Padding(
-              padding: const EdgeInsets.all(28),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -50,12 +50,12 @@ class _ApollonDashboardPageState extends State<ApollonDashboardPage> {
                     height: 260, // Erhöhte Höhe für mehr "Luft" innerhalb der Widgets
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: const [
-                        Expanded(child: ApollonWeatherDashboardWidget()),
-                        SizedBox(width: 20),
-                        Expanded(child: Placeholder()), // ApollonEnvDashboardWidget()
-                        SizedBox(width: 20),
-                        Expanded(child: Placeholder()), // ApollonDevicesDashboardWidget()
+                      children: [
+                        const Expanded(child: ApollonWeatherDashboardWidget()),
+                        const SizedBox(width: 16),
+                        Expanded(child: Container()), // ApollonEnvDashboardWidget()
+                        const SizedBox(width: 16),
+                        Expanded(child: Container()), // ApollonDevicesDashboardWidget()
                       ],
                     ),
                   ),

@@ -42,7 +42,7 @@ class _ApollonDashboardHeaderState extends State<ApollonDashboardHeader> {
                       child: Text(
                         DateFormat('HH:mm').format(now),
                         style: GoogleFonts.audiowide(
-                          fontSize: 96,
+                          fontSize: 110,
                           fontWeight: FontWeight.w500,
                           color: Colors.white,
                           height: 1,

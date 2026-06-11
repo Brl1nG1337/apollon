@@ -90,7 +90,7 @@ class _ApollonFlyingCloudsLayerState extends State<ApollonFlyingCloudsLayer>
             // Horizontale Position mit Zeit-Fortschritt (Divisor von 80 auf 50 reduziert für mehr Speed)
             double progressDelta = (elapsedSeconds / 50.0) * cloud.speedMultiplier;
             double currentProgress = (cloud.startProgress + progressDelta) % 1.0;
-            double xPos = screenWidth - (currentProgress * (screenWidth + cloudWidth));
+            double xPos = screenWidth - (currentProgress * (screenWidth + 2*cloudWidth));
 
             // Vertikaler Drift (Sinus-Welle für organisches Schweben)
             double drift = sin((elapsedSeconds * 0.5) + cloud.driftPhase) * cloud.driftIntensity;
