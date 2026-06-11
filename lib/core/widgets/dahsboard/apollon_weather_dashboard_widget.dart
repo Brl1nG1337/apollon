@@ -16,7 +16,7 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
     return Consumer<ApollonWeatherProvider>(
       builder: (context, weatherProv, child) {
         if (weatherProv.isLoading || weatherProv.weatherData == null) {
-          return const DashboardWidgetContainer(
+          return DashboardWidgetContainer(
             child: Center(
               child: CircularProgressIndicator(color: Colors.white),
             ),

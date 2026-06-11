@@ -8,6 +8,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'core/app/app_init_page.dart';
 import 'core/providers/apollon_weather_provider.dart';
+import 'core/providers/dashboard_expansion_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,8 +28,11 @@ Future<void> main() async {
   }
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => ApollonWeatherProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ApollonWeatherProvider()),
+        ChangeNotifierProvider(create: (context) => DashboardExpansionProvider()),
+      ],
       child: const ApollonApplication(),
     ),
   );
