@@ -95,7 +95,7 @@ class ApollonLayeredWeatherResult {
     final double ry = (displayHeight / 2) - (displayHeight*.1); // Mehr vertikaler Spielraum
 
     // Theta von 0 bis PI für einen Halbkreis/Halbellipse
-    final double theta = pi * .5;
+    final double theta = pi * progress;
 
     // x = cx - rx * cos(theta) -> startet links (0.0) und endet rechts (1.0)
     // y = cy - ry * sin(theta) -> startet auf Horizont, steigt auf Peak, endet auf Horizont

@@ -43,7 +43,7 @@ class _ApollonAnimatedBackgroundState extends State<ApollonAnimatedBackground> {
 
         final data = weatherProv.weatherData!;
         final now = DateTime.now();
-        final progress = data.calculateCurrentProgress(now);
+        final progress = data.calculateCurrentProgress(now.add(Duration(hours: 14)));
         final celestialPos = data.getPosition(800, 480, customProgress: progress).toOffset();
 
         // Dynamische Größe berechnen (sinus-kurve: 0.0 -> klein, 0.5 -> groß, 1.0 -> klein)
