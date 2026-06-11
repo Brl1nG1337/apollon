@@ -9,6 +9,7 @@ import '../widgets/common/apollon_page_container.dart';
 import '../widgets/dahsboard/apollon_weather_dashboard_widget.dart';
 import '../widgets/dahsboard/apollon_env_dashboard_widget.dart';
 import '../widgets/dahsboard/apollon_devices_dashboard_widget.dart';
+import '../widgets/dahsboard/dashboard_widget_container.dart';
 
 class ApollonDashboardPage extends StatefulWidget {
   const ApollonDashboardPage({super.key});
@@ -53,9 +54,9 @@ class _ApollonDashboardPageState extends State<ApollonDashboardPage> {
                       children: [
                         const Expanded(child: ApollonWeatherDashboardWidget()),
                         const SizedBox(width: 16),
-                        Expanded(child: Container()), // ApollonEnvDashboardWidget()
+                        Expanded(child: DashboardWidgetContainer(child: Container(),)), // ApollonEnvDashboardWidget()
                         const SizedBox(width: 16),
-                        Expanded(child: Container()), // ApollonDevicesDashboardWidget()
+                        Expanded(child: DashboardWidgetContainer(child: Container())), // ApollonDevicesDashboardWidget()
                       ],
                     ),
                   ),
