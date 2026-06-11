@@ -5,29 +5,48 @@ import 'package:http/http.dart' as http;
 import '../models/weather/apollon_layered_weather_result.dart';
 
 class ApollonWeatherService {
-  final String _apiUrl =
-      "https://api.open-meteo.com/v1/forecast?latitude=51.671570&longitude=7.816049&timezone=Europe%2FBerlin&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,is_day&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&forecast_days=7";
+  // Koordinaten für Hamm NRW Mitte
+  static const double lat = 51.671570;
+  static const double lon = 7.816049;
+
+  final String _openMeteoUrl =
+      "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&timezone=Europe%2FBerlin&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,is_day&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&forecast_days=7";
+
+  final String _brightSkyUrl =
+      "https://api.brightsky.dev/current_weather?lat=$lat&lon=$lon";
 
   Future<ApollonLayeredWeatherResult> fetchCurrentWeather() async {
     final DateTime now = DateTime.now();
     try {
-      final response = await http.get(Uri.parse(_apiUrl));
+      // Beide APIs parallel abfragen
+      final results = await Future.wait([
+        http.get(Uri.parse(_openMeteoUrl)),
+        http.get(Uri.parse(_brightSkyUrl)),
+      ]);
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+      if (results[0].statusCode == 200 && results[1].statusCode == 200) {
+        final openMeteoData = jsonDecode(results[0].body);
+        final brightSkyData = jsonDecode(results[1].body)['weather'];
 
-        final current = data['current'];
-        final double currentTemp = current['temperature_2m'].toDouble();
-        final double apparentTemp = current['apparent_temperature'].toDouble();
-        final double humidity = current['relative_humidity_2m'].toDouble();
-        final double windSpeed = current['wind_speed_10m'].toDouble();
-        final int weatherCode = current['weather_code'];
+        // --- Daten von Open-Meteo (Basis & Forecast) ---
+        final currentOM = openMeteoData['current'];
+        final double humidity = currentOM['relative_humidity_2m'].toDouble();
+        final double windSpeed = currentOM['wind_speed_10m'].toDouble();
+        final double apparentTempOM = currentOM['apparent_temperature'].toDouble();
         
-        final daily = data['daily'];
+        final daily = openMeteoData['daily'];
         final DateTime sunrise = DateTime.parse(daily['sunrise'][0]);
         final DateTime sunset = DateTime.parse(daily['sunset'][0]);
         final double dailyMax = daily['temperature_2m_max'][0].toDouble();
         final double dailyMin = daily['temperature_2m_min'][0].toDouble();
+
+        // --- Daten von Bright Sky (Aktuelle Präzision) ---
+        // Wir nutzen Bright Sky für die Temperatur und den Wetter-Zustand (Icon)
+        final double currentTemp = (brightSkyData['temperature'] as num).toDouble();
+        final String bsIcon = brightSkyData['icon'];
+        final int weatherCode = _mapBrightSkyIconToWmo(bsIcon);
+        // Bright Sky apparent_temperature nutzen falls vorhanden, sonst Fallback auf OM
+        final double apparentTemp = (brightSkyData['apparent_temperature'] ?? apparentTempOM).toDouble();
 
         // Bestimmung ob Tag ist
         final bool isDay = now.isAfter(sunrise) && now.isBefore(sunset);
@@ -38,9 +57,11 @@ class ApollonWeatherService {
           sunset,
           isDay,
         );
+        
+        // Hintergrund-Logik basierend auf dem präzisen Bright Sky Code
         final weather = _mapWmoToWeather(weatherCode);
 
-        // Daily forecast
+        // Daily forecast (bleibt Open-Meteo)
         final List<DailyForecast> dailyForecast = [];
         final List<dynamic> dailyDates = daily['time'];
         final List<dynamic> dailyCodes = daily['weather_code'];
@@ -56,8 +77,8 @@ class ApollonWeatherService {
           ));
         }
 
-        // Hourly data processing
-        final hourly = data['hourly'];
+        // Hourly data processing (bleibt Open-Meteo)
+        final hourly = openMeteoData['hourly'];
         final List<dynamic> times = hourly['time'];
         final List<dynamic> temps = hourly['temperature_2m'];
         final List<dynamic> codes = hourly['weather_code'];
@@ -70,14 +91,12 @@ class ApollonWeatherService {
         for (int i = 0; i < times.length; i++) {
           final time = DateTime.parse(times[i]);
 
-          // Find current/next precipitation probability
           if (!foundCurrentPrecip &&
               time.isAfter(now.subtract(const Duration(hours: 1)))) {
             currentPrecipProb = (precipProbs[i] as num).toInt();
             foundCurrentPrecip = true;
           }
 
-          // Forecast: next 5 items with 3-hour intervals
           if (time.isAfter(now)) {
             if (hourlyForecast.isEmpty ||
                 time.difference(hourlyForecast.last.time).inHours >= 3) {
@@ -122,6 +141,7 @@ class ApollonWeatherService {
         return _fallbackData();
       }
     } catch (e) {
+      print("Error fetching combined weather data: $e");
       return _fallbackData();
     }
   }
@@ -129,6 +149,31 @@ class ApollonWeatherService {
   // ==========================================
   // HILFSMETHODEN
   // ==========================================
+
+  int _mapBrightSkyIconToWmo(String icon) {
+    switch (icon) {
+      case 'clear-day':
+      case 'clear-night':
+        return 0;
+      case 'partly-cloudy-day':
+      case 'partly-cloudy-night':
+        return 2;
+      case 'cloudy':
+        return 3;
+      case 'fog':
+        return 45;
+      case 'rain':
+        return 61;
+      case 'sleet':
+        return 66;
+      case 'snow':
+        return 71;
+      case 'thunderstorm':
+        return 95;
+      default:
+        return 0;
+    }
+  }
 
   double _calculateMoonPhase(DateTime date) {
     final newMoon = DateTime.utc(2024, 1, 11, 11, 57);

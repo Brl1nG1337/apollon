@@ -58,16 +58,15 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(
-          width: 70,
-          height: 70,
+          width: 65,
+          height: 65,
           child: Lottie.asset(
             _getWmoLottie(data.weatherCode, data.isDay),
             fit: BoxFit.contain,
           ),
         ),
-        const SizedBox(width: 4),
         Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +76,7 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
                   '${data.currentTemp.round()}',
                   style: GoogleFonts.plusJakartaSans(
                     color: Colors.white,
-                    fontSize: 64,
+                    fontSize: 72,
                     fontWeight: FontWeight.w700,
                     height: 1.0,
                     shadows: shadow,
@@ -97,10 +96,11 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
             Text(
               _getWmoDescription(data.weatherCode),
               style: GoogleFonts.plusJakartaSans(
-                color: Colors.white,
-                fontSize: 14,
+                color: Colors.white70,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 shadows: shadow,
+                height: 1
               ),
             ),
           ],
@@ -111,48 +111,32 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
 
   Widget _buildMiddleSection(ApollonLayeredWeatherResult data, List<Shadow> shadow) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Expanded(
-          flex: 2,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildMetricItem(
-                icon: Icons.thermostat,
-                label: 'Gefühlt',
-                value: '${data.apparentTemp.round()}°',
-                shadow: shadow,
-                iconColor: Colors.orangeAccent,
-              ),
-              const SizedBox(height: 4),
-              _buildMetricItem(
-                icon: Icons.water_drop,
-                label: 'Regen',
-                value: '${data.precipitationProbability}%',
-                shadow: shadow,
-                iconColor: Colors.lightBlueAccent,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 4),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
           decoration: BoxDecoration(
             color: Colors.white.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.white24),
           ),
           child: Column(
             children: [
               _buildMinMaxItem(Icons.arrow_upward, Colors.orange, data.dailyMax, shadow),
               const SizedBox(height: 2),
-              Container(width: 30, height: 1, color: Colors.white24),
+              Container(width: 40, height: 2, color: Colors.white24),
               const SizedBox(height: 2),
               _buildMinMaxItem(Icons.arrow_downward, Colors.lightBlue, data.dailyMin, shadow),
             ],
           ),
+        ),
+        const SizedBox(width: 12),
+        _buildMetricItem(
+          icon: Icons.water_drop,
+          label: 'Regen',
+          value: '${data.precipitationProbability}%',
+          shadow: shadow,
+          iconColor: Colors.lightBlueAccent,
         ),
       ],
     );
@@ -162,13 +146,13 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, color: color, size: 14),
+        Icon(icon, color: color, size: 28),
         const SizedBox(width: 2),
         Text(
           '${val.round()}°',
           style: GoogleFonts.plusJakartaSans(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: 22,
             fontWeight: FontWeight.w700,
             shadows: shadow,
           ),
@@ -188,14 +172,14 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 28,
-          height: 28,
+          width: 40,
+          height: 40,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: Colors.white.withOpacity(0.12),
             border: Border.all(color: Colors.white24),
           ),
-          child: Icon(icon, color: iconColor, size: 14),
+          child: Icon(icon, color: iconColor, size: 28),
         ),
         const SizedBox(width: 6),
         Flexible(
@@ -207,9 +191,10 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
                 label,
                 style: GoogleFonts.plusJakartaSans(
                   color: Colors.white70,
-                  fontSize: 10,
+                  fontSize: 20,
                   fontWeight: FontWeight.w500,
                   shadows: shadow,
+                  height: 1
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -217,7 +202,7 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
                 value,
                 style: GoogleFonts.plusJakartaSans(
                   color: Colors.white,
-                  fontSize: 14,
+                  fontSize: 22,
                   fontWeight: FontWeight.w700,
                   shadows: shadow,
                 ),
@@ -230,12 +215,12 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
   }
 
   Widget _buildForecastSection(ApollonLayeredWeatherResult data, List<Shadow> shadow) {
-    final forecast = data.dailyForecast.skip(1).take(3).toList();
+    final forecast = data.dailyForecast.skip(1).take(2).toList();
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
+        color: Colors.white.withOpacity(0.12),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white12),
       ),
@@ -245,7 +230,7 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
           for (int i = 0; i < forecast.length; i++) ...[
             _buildDailyForecastItem(forecast[i], shadow),
             if (i < forecast.length - 1)
-              Container(width: 1, height: 40, color: Colors.white12),
+              Container(width: 2, height: 40, color: Colors.white70),
           ],
         ],
       ),
@@ -274,7 +259,7 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
                 '${item.maxTemp.round()}°',
                 style: GoogleFonts.plusJakartaSans(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 14,
                   fontWeight: FontWeight.w700,
                   shadows: shadow,
                 ),
@@ -284,7 +269,7 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
                 '${item.minTemp.round()}°',
                 style: GoogleFonts.plusJakartaSans(
                   color: Colors.white70,
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                   shadows: shadow,
                 ),
