@@ -59,7 +59,6 @@ class _ApollonFlyingCloudsLayerState extends State<ApollonFlyingCloudsLayer>
           // Parallax-Effekt: Große Wolken (vorne) bewegen sich schneller
           speedMultiplier: (0.7 + _rnd.nextDouble() * 0.5) * (scale + 0.5),
           startProgress: _rnd.nextDouble(),
-          opacity: 0.2 + (_rnd.nextDouble() * 0.5), // Etwas dezentere Transparenz
           driftPhase: _rnd.nextDouble() * pi * 2,
           driftIntensity: 3.0 + (_rnd.nextDouble() * 10.0), // Weniger vertikaler Drift
         ),
@@ -101,15 +100,12 @@ class _ApollonFlyingCloudsLayerState extends State<ApollonFlyingCloudsLayer>
               left: xPos,
               child: Transform.scale(
                 scale: cloud.scale,
-                child: Opacity(
-                  opacity: cloud.opacity,
-                  child: SizedBox(
-                    width: 140, // Reduzierte Basisbreite
-                    child: Lottie.asset(
-                      widget.cloudAssetPath,
-                      // Wir verlangsamen die interne Lottie-Animation leicht für mehr Ruhe
-                      repeat: true,
-                    ),
+                child: SizedBox(
+                  width: 140, // Reduzierte Basisbreite
+                  child: Lottie.asset(
+                    widget.cloudAssetPath,
+                    // Wir verlangsamen die interne Lottie-Animation leicht für mehr Ruhe
+                    repeat: true,
                   ),
                 ),
               ),
@@ -126,7 +122,6 @@ class _CloudData {
   final double scale;
   final double speedMultiplier;
   final double startProgress;
-  final double opacity;
   final double driftPhase;
   final double driftIntensity;
 
@@ -135,7 +130,6 @@ class _CloudData {
     required this.scale,
     required this.speedMultiplier,
     required this.startProgress,
-    required this.opacity,
     required this.driftPhase,
     required this.driftIntensity,
   });

@@ -20,7 +20,7 @@ class ApollonWeatherProvider extends ChangeNotifier {
     loadWeather();
 
     // 2. Einen Timer setzen, der alle 30 Minuten neue Daten zieht.
-    _timer = Timer.periodic(const Duration(minutes: 30), (_) {
+    _timer = Timer.periodic(const Duration(minutes: 1), (_) {
       loadWeather();
     });
   }

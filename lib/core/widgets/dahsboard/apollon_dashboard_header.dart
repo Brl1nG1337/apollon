@@ -33,7 +33,7 @@ class _ApollonDashboardHeaderState extends State<ApollonDashboardHeader> {
             builder: (context, snapshot) {
               final now = snapshot.data!;
               return Padding(
-                padding: const EdgeInsets.only(top: 48),
+                padding: const EdgeInsets.only(top: 16),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -56,14 +56,14 @@ class _ApollonDashboardHeaderState extends State<ApollonDashboardHeader> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 4),
                     Text(
                       DateFormat('EEEE, d. MMMM yyyy', 'de_DE').format(now),
                       style: GoogleFonts.plusJakartaSans(
-                        fontSize: 18,
+                        fontSize: 22,
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.0,
+                        height: 1,
                         shadows: [
                           Shadow(
                             color: Colors.black.withOpacity(0.8),

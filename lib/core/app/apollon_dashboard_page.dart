@@ -47,7 +47,7 @@ class _ApollonDashboardPageState extends State<ApollonDashboardPage> {
 
                   // --- WIDGET ROW: Wetter, Umgebung, Geräte ---
                   SizedBox(
-                    height: 240, // Erhöhte Höhe für mehr "Luft" innerhalb der Widgets
+                    height: 260, // Erhöhte Höhe für mehr "Luft" innerhalb der Widgets
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: const [

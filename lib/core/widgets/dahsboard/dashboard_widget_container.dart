@@ -17,12 +17,9 @@ class DashboardWidgetContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(28),
+      borderRadius: BorderRadius.circular(24),
       child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: 25,
-          sigmaY: 50,
-        ),
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -30,15 +27,16 @@ class DashboardWidgetContainer extends StatelessWidget {
             child: Container(
               padding: padding,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(28),
-                color: Colors.black.withOpacity(0.20), // Dunklerer Hintergrund für besseren Textkontrast
+                borderRadius: BorderRadius.circular(24),
+                color: Colors.white.withOpacity(0.18),
+                // Dunklerer Hintergrund für besseren Textkontrast
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.15),
-                  width: 1.5,
+                  color: Colors.white.withOpacity(0.35),
+                  width: 2,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withOpacity(0.28),
                     blurRadius: 25,
                     offset: const Offset(0, 10),
                   ),

@@ -14,6 +14,20 @@ class HourlyForecast {
   });
 }
 
+class DailyForecast {
+  final DateTime date;
+  final int weatherCode;
+  final double maxTemp;
+  final double minTemp;
+
+  DailyForecast({
+    required this.date,
+    required this.weatherCode,
+    required this.maxTemp,
+    required this.minTemp,
+  });
+}
+
 class ApollonLayeredWeatherResult {
   final bool isDay;
   final double celestialProgress;
@@ -28,11 +42,15 @@ class ApollonLayeredWeatherResult {
 
   // --- NEU für Dashboard Widget ---
   final double currentTemp;
+  final double apparentTemp;
   final int weatherCode;
   final double humidity;
   final double windSpeed;
   final int precipitationProbability;
+  final double dailyMax;
+  final double dailyMin;
   final List<HourlyForecast> hourlyForecast;
+  final List<DailyForecast> dailyForecast;
 
   // --- NEU: Astronomie-Basisdaten ---
   final DateTime sunrise;
@@ -47,11 +65,15 @@ class ApollonLayeredWeatherResult {
     this.cloudAssetPath,
     this.weatherLayerAsset,
     required this.currentTemp,
+    required this.apparentTemp,
     required this.weatherCode,
     required this.humidity,
     required this.windSpeed,
     required this.precipitationProbability,
+    required this.dailyMax,
+    required this.dailyMin,
     required this.hourlyForecast,
+    required this.dailyForecast,
     required this.sunrise,
     required this.sunset,
   });

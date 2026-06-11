@@ -6,7 +6,7 @@ import '../models/weather/apollon_layered_weather_result.dart';
 
 class ApollonWeatherService {
   final String _apiUrl =
-      "https://api.open-meteo.com/v1/forecast?latitude=51.671570&longitude=7.816049&timezone=Europe%2FBerlin&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,is_day&hourly=temperature_2m,weather_code,precipitation_probability&daily=sunrise,sunset&forecast_days=1";
+      "https://api.open-meteo.com/v1/forecast?latitude=51.671570&longitude=7.816049&timezone=Europe%2FBerlin&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m,is_day&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset&forecast_days=7";
 
   Future<ApollonLayeredWeatherResult> fetchCurrentWeather() async {
     final DateTime now = DateTime.now();
@@ -18,6 +18,7 @@ class ApollonWeatherService {
 
         final current = data['current'];
         final double currentTemp = current['temperature_2m'].toDouble();
+        final double apparentTemp = current['apparent_temperature'].toDouble();
         final double humidity = current['relative_humidity_2m'].toDouble();
         final double windSpeed = current['wind_speed_10m'].toDouble();
         final int weatherCode = current['weather_code'];
@@ -25,6 +26,8 @@ class ApollonWeatherService {
         final daily = data['daily'];
         final DateTime sunrise = DateTime.parse(daily['sunrise'][0]);
         final DateTime sunset = DateTime.parse(daily['sunset'][0]);
+        final double dailyMax = daily['temperature_2m_max'][0].toDouble();
+        final double dailyMin = daily['temperature_2m_min'][0].toDouble();
 
         // Bestimmung ob Tag ist
         final bool isDay = now.isAfter(sunrise) && now.isBefore(sunset);
@@ -36,6 +39,22 @@ class ApollonWeatherService {
           isDay,
         );
         final weather = _mapWmoToWeather(weatherCode);
+
+        // Daily forecast
+        final List<DailyForecast> dailyForecast = [];
+        final List<dynamic> dailyDates = daily['time'];
+        final List<dynamic> dailyCodes = daily['weather_code'];
+        final List<dynamic> dailyMaxes = daily['temperature_2m_max'];
+        final List<dynamic> dailyMines = daily['temperature_2m_min'];
+
+        for (int i = 0; i < dailyDates.length; i++) {
+          dailyForecast.add(DailyForecast(
+            date: DateTime.parse(dailyDates[i]),
+            weatherCode: dailyCodes[i],
+            maxTemp: dailyMaxes[i].toDouble(),
+            minTemp: dailyMines[i].toDouble(),
+          ));
+        }
 
         // Hourly data processing
         final hourly = data['hourly'];
@@ -87,11 +106,15 @@ class ApollonWeatherService {
           cloudAssetPath: weather.cloud,
           weatherLayerAsset: weather.overlay,
           currentTemp: currentTemp,
+          apparentTemp: apparentTemp,
           weatherCode: weatherCode,
           humidity: humidity,
           windSpeed: windSpeed,
           precipitationProbability: currentPrecipProb,
+          dailyMax: dailyMax,
+          dailyMin: dailyMin,
           hourlyForecast: hourlyForecast,
+          dailyForecast: dailyForecast,
           sunrise: sunrise,
           sunset: sunset,
         );
@@ -158,7 +181,7 @@ class ApollonWeatherService {
     if ((code >= 61 && code <= 67) || (code >= 80 && code <= 82))
       return (
         count: 5,
-        cloud: '${base}dark_cloud.json',
+        cloud: '${base}cloud.json',
         overlay: '${base}rain_overlay.json',
       );
     if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86))
@@ -170,8 +193,8 @@ class ApollonWeatherService {
     if (code >= 95)
       return (
         count: 6,
-        cloud: '${base}dark_cloud.json',
-        overlay: '${base}dark_cloud_lightning.json',
+        cloud: '${base}dark_cloud_lightning.json',
+        overlay: '${base}rain_overlay.json',
       );
 
     return (count: 3, cloud: '${base}cloud.json', overlay: null);
@@ -202,11 +225,15 @@ class ApollonWeatherService {
       cloudAssetPath: 'assets/lottie/animated-background/cloud.json',
       weatherLayerAsset: null,
       currentTemp: 20.0,
+      apparentTemp: 19.0,
       weatherCode: 0,
       humidity: 50.0,
       windSpeed: 10.0,
       precipitationProbability: 0,
+      dailyMax: 22.0,
+      dailyMin: 15.0,
       hourlyForecast: [],
+      dailyForecast: [],
       sunrise: DateTime(now.year, now.month, now.day, 6),
       sunset: DateTime(now.year, now.month, now.day, 20),
     );
