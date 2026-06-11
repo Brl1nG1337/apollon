@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class DeviceService {
   // Die IP deines Raspberry Pi im lokalen Netzwerk
-  final String _baseUrl = 'http://192.168.0.130:8080/api/devices';
+  final String _baseUrl = 'http://192.168.178.168:8080/api/devices';
 
   /// Sendet ein neues Gerät an das Spring Boot Backend.
   /// Wirft eine [Exception], falls der Server mit einem Fehlercode antwortet.
