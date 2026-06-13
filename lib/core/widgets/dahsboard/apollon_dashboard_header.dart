@@ -1,6 +1,7 @@
 import 'package:apollon/core/app/apollon_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 
 class ApollonDashboardHeader extends StatefulWidget {
@@ -81,24 +82,16 @@ class _ApollonDashboardHeaderState extends State<ApollonDashboardHeader> {
           
           // Settings Icon (am rechten Rand)
           Positioned(
-            right: 0,
-            top: 0,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white.withOpacity(0.2)),
-              ),
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const ApollonSettingsPage()),
-                  );
-                },
-                child: const Icon(Icons.settings_outlined, color: Colors.white, size: 24),
-              ),
+            right: 8,
+            top: 12,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ApollonSettingsPage()),
+                );
+              },
+              child: const Icon(FlutterIcons.md_settings_ion, color: Colors.white, size: 42),
             ),
           ),
         ],
