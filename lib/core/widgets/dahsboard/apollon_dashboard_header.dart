@@ -91,7 +91,7 @@ class _ApollonDashboardHeaderState extends State<ApollonDashboardHeader> {
                   MaterialPageRoute(builder: (context) => const ApollonSettingsPage()),
                 );
               },
-              child: const Icon(FlutterIcons.md_settings_ion, color: Colors.white, size: 42),
+              child: const Icon(Icons.settings, color: Colors.white, size: 42),
             ),
           ),
         ],
