@@ -1,7 +1,6 @@
 import 'package:apollon/core/app/apollon_settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:icons_flutter/icons_flutter.dart';
 import 'package:intl/intl.dart';
 
 class ApollonDashboardHeader extends StatefulWidget {
@@ -17,7 +16,10 @@ class _ApollonDashboardHeaderState extends State<ApollonDashboardHeader> {
   @override
   void initState() {
     super.initState();
-    _timeStream = Stream.periodic(const Duration(seconds: 1), (_) => DateTime.now());
+    _timeStream = Stream.periodic(
+      const Duration(seconds: 1),
+      (_) => DateTime.now(),
+    );
   }
 
   @override
@@ -79,7 +81,7 @@ class _ApollonDashboardHeaderState extends State<ApollonDashboardHeader> {
               );
             },
           ),
-          
+
           // Settings Icon (am rechten Rand)
           Positioned(
             right: 8,
@@ -88,7 +90,9 @@ class _ApollonDashboardHeaderState extends State<ApollonDashboardHeader> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const ApollonSettingsPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const ApollonSettingsPage(),
+                  ),
                 );
               },
               child: const Icon(Icons.settings, color: Colors.white, size: 42),
