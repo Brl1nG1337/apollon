@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../services/settings/apollon_settings_manager.dart';
 import '../services/settings/apollon_settings_service.dart';
+import 'apollon_dashboard_page.dart';
 
 class AppInitPage extends StatefulWidget {
   const AppInitPage({super.key});
@@ -42,11 +43,11 @@ class _AppInitPageState extends State<AppInitPage> {
       _manager.currentProfile = profile;
 
       // 3. Weiterleitung zur Hauptseite (ohne Zurück-Option)
-      // if (mounted) {
-      //   Navigator.of(context).pushReplacement(
-      //     MaterialPageRoute(builder: (_) => const ApollonDashboardPage()),
-      //   );
-      // }
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const ApollonDashboardPage()),
+        );
+      }
     } catch (e) {
       setState(() {
         _hasError = true;
@@ -91,7 +92,7 @@ class _AppInitPageState extends State<AppInitPage> {
                     fontSize: 22,
                     color: Colors.white70,
                     decoration: TextDecoration.none,
-                    letterSpacing: -1
+                    letterSpacing: -1,
                   ),
                 ),
                 const SizedBox(height: 20),
