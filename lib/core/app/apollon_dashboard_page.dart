@@ -26,7 +26,7 @@ class _ApollonDashboardPageState extends State<ApollonDashboardPage> with Single
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 400),
     );
     _animation = CurvedAnimation(
       parent: _animationController,
