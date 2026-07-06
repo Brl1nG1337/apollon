@@ -63,8 +63,8 @@ class _AppInitPageState extends State<AppInitPage> {
     return ApollonPageContainer(
       child: Stack(
         children: [
-          ApollonAnimatedBackground(),
-          // defusor
+          const ApollonAnimatedBackground(),
+          // Defusor
           Positioned.fill(
             child: ClipRect(
               child: BackdropFilter(
@@ -74,37 +74,51 @@ class _AppInitPageState extends State<AppInitPage> {
             ),
           ),
           Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "APOLLON-OS™",
-                  style: GoogleFonts.audiowide(
-                    height: 1,
-                    fontSize: 48,
-                    color: Colors.white,
-                    decoration: TextDecoration.none,
+            child: SizedBox(
+              width: 300, // Begrenzt die Breite, damit der Ladebalken gut aussieht
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "APOLLON-OS™",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.audiowide(
+                      height: 1,
+                      fontSize: 48,
+                      color: Colors.white,
+                      decoration: TextDecoration.none,
+                    ),
                   ),
-                ),
-                Text(
-                  _loadingText,
-                  style: GoogleFonts.audiowide(
-                    fontSize: 22,
-                    color: Colors.white70,
-                    decoration: TextDecoration.none,
-                    letterSpacing: -1,
+                  const SizedBox(height: 12),
+                  Text(
+                    _loadingText,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.audiowide(
+                      fontSize: 18, // Leicht verkleinert, damit es harmonischer wirkt
+                      color: Colors.white70,
+                      decoration: TextDecoration.none,
+                      letterSpacing: -0.5,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                if (!_hasError)
-                  CircularProgressIndicator(color: Colors.white)
-                else
-                  IconButton(
-                    icon: const Icon(Icons.refresh_rounded, size: 48),
-                    color: colors.error,
-                    onPressed: _loadAppDependencies,
-                  ),
-              ],
+                  const SizedBox(height: 30),
+                  if (!_hasError)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4), // Abgerundete Ecken für den Balken
+                      child: LinearProgressIndicator(
+                        backgroundColor: Colors.white12,
+                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                        minHeight: 6, // Etwas dickerer, moderner Ladebalken
+                      ),
+                    )
+                  else
+                    IconButton(
+                      icon: const Icon(Icons.refresh_rounded, size: 48),
+                      color: colors.error,
+                      onPressed: _loadAppDependencies,
+                    ),
+                ],
+              ),
             ),
           ),
         ],
