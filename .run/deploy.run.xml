@@ -1,6 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="deploy" type="PowerShellRunType" factoryName="PowerShell" scriptUrl="C:\Users\basti\IdeaProjects\apollon\dev\deploy.ps1" executablePath="$PROJECT_DIR$/../../../../Windows/System32/WindowsPowerShell/v1.0/powershell.exe">
-    <envs />
-    <method v="2" />
-  </configuration>
-</component>
