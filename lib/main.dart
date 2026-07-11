@@ -1,6 +1,5 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
@@ -8,26 +7,29 @@ import 'package:window_manager/window_manager.dart';
 
 import 'core/app/app_init_page.dart';
 import 'core/providers/apollon_weather_provider.dart';
-import 'core/providers/dashboard_expansion_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
 
-  WindowOptions windowOptions = const WindowOptions(
-    size: Size(800, 480), // Deine Display-Auflösung
-    center: true,
-    backgroundColor: Colors.transparent,
-    skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.hidden, // Versteckt den Fensterrahmen
-    fullScreen: true,                   // Hier ist der Kiosk-Modus
-  );
+  // Initialisierung nur auf Desktop-Plattformen ausführen
+  if (!kIsWeb && (Platform.isLinux || Platform.isWindows || Platform.isMacOS)) {
+    await windowManager.ensureInitialized();
 
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-    await windowManager.setFullScreen(true); // Vollbild erzwingen
-  });
+    WindowOptions windowOptions = const WindowOptions(
+      size: Size(800, 480),
+      center: true,
+      backgroundColor: Colors.transparent,
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.hidden,
+      fullScreen: true,
+    );
+
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+      await windowManager.setFullScreen(true);
+    });
+  }
 
   // Initialisiere Datumsformate für Deutsch
   await initializeDateFormatting('de_DE', null);
@@ -36,7 +38,6 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ApollonWeatherProvider()),
-        ChangeNotifierProvider(create: (context) => DashboardExpansionProvider()),
       ],
       child: const ApollonApplication(),
     ),

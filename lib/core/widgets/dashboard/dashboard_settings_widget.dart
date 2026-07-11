@@ -1,4 +1,4 @@
-import 'package:apollon/core/widgets/dahsboard/dashboard_widget_container.dart';
+import 'package:apollon/core/widgets/dashboard/dashboard_widget_container.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../apollon_constants.dart';
+
 class DeviceService {
-  // Die IP deines Raspberry Pi im lokalen Netzwerk
-  final String _baseUrl = 'http://192.168.11.120:8080/api/devices';
+  String get _baseUrl => '${ApollonConstants.backendBaseUrl}/api/devices';
+
 
   /// Sendet ein neues Gerät an das Spring Boot Backend.
   /// Wirft eine [Exception], falls der Server mit einem Fehlercode antwortet.

@@ -1,3 +1,4 @@
+import '../../app/detail/apollon_weather_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -34,6 +35,14 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
 
         return DashboardWidgetContainer(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ApollonWeatherDetailPage(),
+              ),
+            );
+          },
           child: Column(
             children: [
               // --- TOP SECTION ---
@@ -53,7 +62,10 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildTopSection(ApollonLayeredWeatherResult data, List<Shadow> shadow) {
+  Widget _buildTopSection(
+    ApollonLayeredWeatherResult data,
+    List<Shadow> shadow,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -100,7 +112,7 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 shadows: shadow,
-                height: 1
+                height: 1,
               ),
             ),
           ],
@@ -109,7 +121,10 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildMiddleSection(ApollonLayeredWeatherResult data, List<Shadow> shadow) {
+  Widget _buildMiddleSection(
+    ApollonLayeredWeatherResult data,
+    List<Shadow> shadow,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -122,11 +137,21 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
           ),
           child: Column(
             children: [
-              _buildMinMaxItem(Icons.arrow_upward, Colors.orange, data.dailyMax, shadow),
+              _buildMinMaxItem(
+                Icons.arrow_upward,
+                Colors.orange,
+                data.dailyMax,
+                shadow,
+              ),
               const SizedBox(height: 2),
               Container(width: 40, height: 2, color: Colors.white24),
               const SizedBox(height: 2),
-              _buildMinMaxItem(Icons.arrow_downward, Colors.lightBlue, data.dailyMin, shadow),
+              _buildMinMaxItem(
+                Icons.arrow_downward,
+                Colors.lightBlue,
+                data.dailyMin,
+                shadow,
+              ),
             ],
           ),
         ),
@@ -142,7 +167,12 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildMinMaxItem(IconData icon, Color color, double val, List<Shadow> shadow) {
+  Widget _buildMinMaxItem(
+    IconData icon,
+    Color color,
+    double val,
+    List<Shadow> shadow,
+  ) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -194,7 +224,7 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
                   fontSize: 20,
                   fontWeight: FontWeight.w500,
                   shadows: shadow,
-                  height: 1
+                  height: 1,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -214,7 +244,10 @@ class ApollonWeatherDashboardWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildForecastSection(ApollonLayeredWeatherResult data, List<Shadow> shadow) {
+  Widget _buildForecastSection(
+    ApollonLayeredWeatherResult data,
+    List<Shadow> shadow,
+  ) {
     final forecast = data.dailyForecast.skip(1).take(2).toList();
 
     return Container(

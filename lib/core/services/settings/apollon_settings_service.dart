@@ -2,15 +2,15 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../../apollon_constants.dart';
 import '../../models/apollon_setting.dart';
 import '../../models/apollon_settings_profile.dart';
 
 class ApollonSettingsService {
-  // Ersetze die IP mit der deines Raspberry Pi / Spring Boot Backends.
-  // Falls du im Emulator testest, nutze 'http://10.0.2.2:8080'
-  final String baseUrl;
+  String get baseUrl => '${ApollonConstants.backendBaseUrl}/api/settings';
 
-  ApollonSettingsService({this.baseUrl = 'http://192.168.11.120:8080/api/settings'});
+  ApollonSettingsService();
+
 
   /// Holt das Einstellungs-Profil anhand seines Namens (z.B. "Default") vom Backend
   Future<ApollonSettingsProfile> fetchProfile(String profileName) async {
