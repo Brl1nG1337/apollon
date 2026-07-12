@@ -1,7 +1,6 @@
 import 'dart:core';
 
 import 'package:apollon/core/widgets/common/apollon_page_container.dart';
-import 'package:apollon/core/widgets/common/list/apollon_text_icon_selection_list.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -10,7 +9,6 @@ import '../models/apollon_settings_category.dart';
 import '../models/enums/settings/apollon_setting_type.dart';
 import '../services/settings/apollon_settings_manager.dart';
 import '../services/settings/apollon_settings_service.dart';
-import '../widgets/common/apollon_basic_app_bar.dart';
 
 class ApollonSettingsPage extends StatefulWidget {
   const ApollonSettingsPage({super.key});
@@ -53,7 +51,10 @@ class _ApollonSettingsPageState extends State<ApollonSettingsPage> {
     // Fallback falls das Profil unerwartet leer sein sollte
     if (profile == null || profile.categories.isEmpty) {
       return const ApollonPageContainer(
-        child: Center(child: Text("Keine Konfigurationsprofile geladen.")),
+        child: Material(
+          type: MaterialType.transparency,
+          child: Center(child: Text("Keine Konfigurationsprofile geladen.")),
+        ),
       );
     }
 
@@ -61,43 +62,104 @@ class _ApollonSettingsPageState extends State<ApollonSettingsPage> {
     final currentCategory = profile.categories[current_tab];
 
     return ApollonPageContainer(
-      child: Column(
-        children: [
-          const ApollonBasicAppBar(title: "Einstellungen"),
-          Expanded(
-            child: Row(
-              children: [
-                // Linke Seite: Menüführung (Flex 4)
-                Expanded(
-                  flex: 4,
-                  child: Container(
-                    color: colors.surfaceContainerLow,
-                    child: ApollonTextIconSelectionList(
-                      selectedIndex: current_tab,
-                      titles: tabTitles,
-                      icons: tabIcons,
-                      onTabSelected: (index) {
-                        setState(() {
-                          current_tab = index;
-                        });
-                      },
+      // HIER IST DER FIX: Ein Material-Widget als direkter Child des Containers
+      child: Material(
+        type: MaterialType.transparency,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Neuer nativer Header mit Zurück-Button
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 24.0, 24.0, 16.0), // Padding links leicht reduziert für den Button
+              child: Row(
+                children: [
+                  // Zurück-Button
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_rounded),
+                    color: colors.onSurface,
+                    iconSize: 28,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  Icon(Icons.settings_suggest_rounded, size: 32, color: colors.primary),
+                  const SizedBox(width: 16),
+                  Text(
+                    "Einstellungen",
+                    style: GoogleFonts.audiowide(
+                      fontSize: 28,
+                      color: colors.onSurface,
                     ),
                   ),
-                ),
-
-                // Rechte Seite: Dynamischer Inhalt mit Animation (Flex 9)
-                Expanded(
-                  flex: 9,
-                  child: Container(
-                    color: colors.surface,
-                    padding: const EdgeInsets.all(24.0),
-                    child: _buildTabContent(currentCategory, profile.name),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+            Divider(height: 1, color: colors.outlineVariant.withOpacity(0.5)),
+
+            Expanded(
+              child: Row(
+                children: [
+                  // Linke Seite: Native Menüführung (Flex 4)
+                  Expanded(
+                    flex: 4,
+                    child: Container(
+                      color: colors.surfaceContainerLow,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(16.0),
+                        itemCount: tabTitles.length,
+                        itemBuilder: (context, index) {
+                          final isSelected = current_tab == index;
+
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: ListTile(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              selected: isSelected,
+                              selectedTileColor: colors.primaryContainer,
+                              leading: Icon(
+                                tabIcons[index],
+                                color: isSelected
+                                    ? colors.onPrimaryContainer
+                                    : colors.onSurfaceVariant,
+                              ),
+                              title: Text(
+                                tabTitles[index],
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? colors.onPrimaryContainer
+                                      : colors.onSurfaceVariant,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                ),
+                              ),
+                              onTap: () {
+                                setState(() {
+                                  current_tab = index;
+                                });
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+
+                  // Rechte Seite: Dynamischer Inhalt mit Animation (Flex 9)
+                  Expanded(
+                    flex: 9,
+                    child: Container(
+                      color: colors.surface,
+                      padding: const EdgeInsets.all(32.0),
+                      child: _buildTabContent(currentCategory, profile.name),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -106,7 +168,6 @@ class _ApollonSettingsPageState extends State<ApollonSettingsPage> {
   Widget _buildTabContent(ApollonSettingsCategory category, String profileName) {
     final colors = Theme.of(context).colorScheme;
 
-    // Wir generieren die Liste der Einstellungsfelder dynamisch aus der DB-Struktur
     Widget content;
 
     if (category.settings.isEmpty) {
@@ -119,7 +180,6 @@ class _ApollonSettingsPageState extends State<ApollonSettingsPage> {
       );
     } else {
       content = ListView.builder(
-        // Jede Kategorie bekommt eine eigene ValueKey basierend auf der ID für den Switcher
         key: ValueKey("cat_${category.id}"),
         itemCount: category.settings.length,
         itemBuilder: (context, index) {
@@ -129,7 +189,6 @@ class _ApollonSettingsPageState extends State<ApollonSettingsPage> {
       );
     }
 
-    // Deine flüssige Wechsel-Animation bleibt komplett erhalten
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       transitionBuilder: (Widget child, Animation<double> animation) {
@@ -179,7 +238,6 @@ class _ApollonSettingsPageState extends State<ApollonSettingsPage> {
             final success = await _settingsService.updateSetting(profileName, updatedSetting);
             if (success) {
               setState(() {
-                // UI neu zeichnen, indem wir den Wert im Cache ersetzen
                 final index = ApollonSettingsManager()
                     .currentProfile!
                     .categories[current_tab]
@@ -215,10 +273,13 @@ class _ApollonSettingsPageState extends State<ApollonSettingsPage> {
                   ? TextInputType.text
                   : const TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(
-                border: const OutlineInputBorder(),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
                 isDense: true,
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.save_rounded),
+                  color: colors.primary,
                   onPressed: () async {
                     dynamic typedValue = controller.text;
 
@@ -239,7 +300,6 @@ class _ApollonSettingsPageState extends State<ApollonSettingsPage> {
 
                     final success = await _settingsService.updateSetting(profileName, updatedSetting);
                     if (success) {
-                      // Cache aktualisieren
                       final index = ApollonSettingsManager()
                           .currentProfile!
                           .categories[current_tab]
@@ -249,7 +309,11 @@ class _ApollonSettingsPageState extends State<ApollonSettingsPage> {
 
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('${setting.label} gespeichert!'), duration: const Duration(seconds: 1)),
+                          SnackBar(
+                            content: Text('${setting.label} gespeichert!'),
+                            duration: const Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                          ),
                         );
                       }
                     }
