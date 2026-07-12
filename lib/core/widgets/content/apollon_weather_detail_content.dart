@@ -25,19 +25,19 @@ class ApollonWeatherDetailContent extends StatelessWidget {
         return Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ─── LINKE SPALTE: Aktuelle Bedingungen ───────────────────────
+            // ─── LINKE SPALTE: Gigantisches aktuelles Wetter ──────────────
             Expanded(
-              flex: 5,
+              flex: 1, // 50% der Breite
               child: _LeftColumn(data: data),
             ),
 
-            const SizedBox(width: 20),
-            Container(width: 1, color: Colors.white24),
-            const SizedBox(width: 20),
+            const SizedBox(width: 24),
+            Container(width: 2, color: Colors.white12), // Etwas dickerer Trenner
+            const SizedBox(width: 24),
 
-            // ─── RECHTE SPALTE: Stündliche + Tages-Prognose ───────────────
+            // ─── RECHTE SPALTE: Große 3-Tages-Prognose ────────────────────
             Expanded(
-              flex: 7,
+              flex: 1, // 50% der Breite
               child: _RightColumn(data: data),
             ),
           ],
@@ -48,7 +48,7 @@ class ApollonWeatherDetailContent extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// LINKE SPALTE
+// LINKE SPALTE: Fokus auf Lesbarkeit aus der Ferne
 // ─────────────────────────────────────────────────────────────────────────────
 class _LeftColumn extends StatelessWidget {
   final ApollonLayeredWeatherResult data;
@@ -59,36 +59,42 @@ class _LeftColumn extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Großes Wetter-Icon + Temperatur
+        // 1. Dieser Spacer drückt alles nach unten, weg vom Zurück-Button
+        const Spacer(),
+
+        // 2. Das große Icon und die Temperatur
         _buildHeroSection(),
-        const Spacer(),
-        // Metrics-Grid
-        _buildMetricsGrid(),
-        const Spacer(),
-        // Sonnenzeiten
-        _buildSunriseSunset(),
+
+        // 3. Fester, großer Abstand zu den Metriken
+        const SizedBox(height: 32),
+
+        // 4. Luftfeuchte & Wind
+        _buildEssentialMetrics(),
+
+        // 5. Etwas Luft zum unteren Bildschirmrand
+        const SizedBox(height: 16),
       ],
     );
   }
 
   Widget _buildHeroSection() {
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      alignment: Alignment.centerLeft,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 90,
-            height: 90,
-            child: Lottie.asset(
-              _getWmoLottie(data.weatherCode, data.isDay),
-              fit: BoxFit.contain,
-            ),
+    return Row(
+      // WICHTIG: Richtet das Lottie-Icon und den Textblock unten bündig an einer Linie aus!
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        SizedBox(
+          width: 140,
+          height: 140,
+          child: Lottie.asset(
+            _getWmoLottie(data.weatherCode, data.isDay),
+            fit: BoxFit.contain,
           ),
-          const SizedBox(width: 8),
-          Column(
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -97,19 +103,19 @@ class _LeftColumn extends StatelessWidget {
                     '${data.currentTemp.round()}',
                     style: GoogleFonts.audiowide(
                       color: Colors.white,
-                      fontSize: 64,
+                      fontSize: 96, // Riesig
                       fontWeight: FontWeight.w700,
                       height: 1.0,
                       shadows: _shadow,
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(top: 6),
+                    padding: const EdgeInsets.only(top: 10),
                     child: Text(
                       '°C',
                       style: GoogleFonts.audiowide(
                         color: Colors.white60,
-                        fontSize: 22,
+                        fontSize: 32,
                         fontWeight: FontWeight.w400,
                         shadows: _shadow,
                       ),
@@ -121,20 +127,22 @@ class _LeftColumn extends StatelessWidget {
                 _getWmoDescription(data.weatherCode),
                 style: GoogleFonts.plusJakartaSans(
                   color: Colors.white70,
-                  fontSize: 16,
+                  fontSize: 24,
                   fontWeight: FontWeight.w700,
                   shadows: _shadow,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 8),
               Row(
                 children: [
-                  const Icon(Icons.thermostat, color: Colors.orange, size: 14),
+                  const Icon(Icons.thermostat, color: Colors.orange, size: 20),
                   Text(
                     ' Gefühlt ${data.apparentTemp.round()}°C',
                     style: GoogleFonts.plusJakartaSans(
                       color: Colors.white54,
-                      fontSize: 13,
+                      fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -142,99 +150,38 @@ class _LeftColumn extends StatelessWidget {
               ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMetricsGrid() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: _MetricTile(
-                icon: Icons.water_drop_outlined,
-                iconColor: Colors.lightBlueAccent,
-                label: 'Luftfeuchte',
-                value: '${data.humidity.round()}%',
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _MetricTile(
-                icon: Icons.umbrella_rounded,
-                iconColor: Colors.indigoAccent,
-                label: 'Regenrisiko',
-                value: '${data.precipitationProbability}%',
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: _MetricTile(
-                icon: Icons.air_rounded,
-                iconColor: Colors.tealAccent,
-                label: 'Wind',
-                value: '${data.windSpeed.round()} km/h',
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _MetricTile(
-                icon: Icons.arrow_upward_rounded,
-                iconColor: Colors.orangeAccent,
-                label: 'Max / Min',
-                value: '${data.dailyMax.round()}° / ${data.dailyMin.round()}°',
-              ),
-            ),
-          ],
         ),
       ],
     );
   }
 
-  Widget _buildSunriseSunset() {
-    final fmt = DateFormat('HH:mm');
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white12),
-      ),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _SunTime(
-              icon: Icons.wb_twilight_rounded,
-              iconColor: Colors.orangeAccent,
-              label: 'Sonnenaufgang',
-              time: fmt.format(data.sunrise),
-            ),
-            const SizedBox(width: 16),
-            Container(width: 1, height: 42, color: Colors.white24),
-            const SizedBox(width: 16),
-            _SunTime(
-              icon: Icons.nights_stay_rounded,
-              iconColor: Colors.deepPurpleAccent,
-              label: 'Sonnenuntergang',
-              time: fmt.format(data.sunset),
-            ),
-          ],
+  Widget _buildEssentialMetrics() {
+    return Row(
+      children: [
+        Expanded(
+          child: _MetricTile(
+            icon: Icons.umbrella_rounded,
+            iconColor: Colors.indigoAccent,
+            label: 'Regenrisiko',
+            value: '${data.precipitationProbability}%',
+          ),
         ),
-      ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: _MetricTile(
+            icon: Icons.air_rounded,
+            iconColor: Colors.tealAccent,
+            label: 'Wind',
+            value: '${data.windSpeed.round()} km/h',
+          ),
+        ),
+      ],
     );
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// RECHTE SPALTE
+// RECHTE SPALTE: Reduziert auf 3 Tage, extrem gut ablesbar
 // ─────────────────────────────────────────────────────────────────────────────
 class _RightColumn extends StatelessWidget {
   final ApollonLayeredWeatherResult data;
@@ -244,47 +191,29 @@ class _RightColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        _SectionLabel(label: 'STÜNDLICHE PROGNOSE', icon: Icons.schedule_rounded),
-        const SizedBox(height: 8),
-        _buildHourlyForecast(),
-        const Spacer(),
-        _SectionLabel(label: 'MEHRTÄGIGE PROGNOSE', icon: Icons.calendar_month_rounded),
-        const SizedBox(height: 8),
+        _SectionLabel(label: 'NÄCHSTE TAGE', icon: Icons.calendar_month_rounded),
+        const SizedBox(height: 24),
         _buildDailyForecast(),
+        const SizedBox(height: 24),
       ],
     );
   }
 
-  Widget _buildHourlyForecast() {
-    final hourly = data.hourlyForecast.take(8).toList();
-    return SizedBox(
-      height: 104,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: hourly.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final h = hourly[index];
-          final isNow = index == 0;
-          return _HourlyItem(forecast: h, isNow: isNow, isDay: data.isDay);
-        },
-      ),
-    );
-  }
-
   Widget _buildDailyForecast() {
-    final daily = data.dailyForecast.skip(1).take(4).toList();
+    final daily = data.dailyForecast.skip(1).take(3).toList();
     final allMin = daily.map((d) => d.minTemp).reduce((a, b) => a < b ? a : b);
     final allMax = daily.map((d) => d.maxTemp).reduce((a, b) => a > b ? a : b);
 
     return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: daily.asMap().entries.map((entry) {
         final index = entry.key;
         final d = entry.value;
         final isLast = index == daily.length - 1;
         return Padding(
-          padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
+          padding: EdgeInsets.only(bottom: isLast ? 0 : 20),
           child: _DailyForecastRow(
             forecast: d,
             rangeMin: allMin,
@@ -316,96 +245,44 @@ class _MetricTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white12),
       ),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        alignment: Alignment.centerLeft,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: iconColor, size: 22),
-                const SizedBox(width: 8),
-                Text(
-                  value,
-                  style: GoogleFonts.plusJakartaSans(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    shadows: _shadow,
-                  ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: iconColor, size: 28),
+              const SizedBox(width: 12),
+              Text(
+                value,
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  shadows: _shadow,
                 ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Text(
-              label,
-              style: GoogleFonts.plusJakartaSans(
-                color: Colors.white54,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
               ),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SunTime extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String label;
-  final String time;
-
-  const _SunTime({
-    required this.icon,
-    required this.iconColor,
-    required this.label,
-    required this.time,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: iconColor, size: 24),
-            const SizedBox(width: 8),
-            Text(
-              time,
-              style: GoogleFonts.audiowide(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: GoogleFonts.plusJakartaSans(
-            color: Colors.white54,
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.3,
+            ],
           ),
-        ),
-      ],
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: GoogleFonts.plusJakartaSans(
+              color: Colors.white54,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -419,81 +296,18 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, color: const Color(0xFFFFB000), size: 16),
-        const SizedBox(width: 6),
+        Icon(icon, color: const Color(0xFFFFB000), size: 24),
+        const SizedBox(width: 8),
         Text(
           label,
           style: GoogleFonts.audiowide(
             color: const Color(0xFFFFB000),
-            fontSize: 12,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
             letterSpacing: 1.2,
           ),
         ),
       ],
-    );
-  }
-}
-
-class _HourlyItem extends StatelessWidget {
-  final HourlyForecast forecast;
-  final bool isNow;
-  final bool isDay;
-
-  const _HourlyItem({
-    required this.forecast,
-    required this.isNow,
-    required this.isDay,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final timeLabel =
-        isNow ? 'Jetzt' : DateFormat('HH:mm').format(forecast.time);
-
-    return Container(
-      width: 68,
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-      decoration: BoxDecoration(
-        color: isNow
-            ? Colors.white.withValues(alpha: 0.18)
-            : Colors.white.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isNow ? Colors.white38 : Colors.white12,
-          width: isNow ? 1.5 : 1,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            timeLabel,
-            style: GoogleFonts.plusJakartaSans(
-              color: isNow ? const Color(0xFFFFB000) : Colors.white60,
-              fontSize: 12,
-              fontWeight: isNow ? FontWeight.w800 : FontWeight.w600,
-            ),
-          ),
-          SizedBox(
-            width: 36,
-            height: 36,
-            child: Lottie.asset(
-              _getWmoLottie(forecast.weatherCode, isDay),
-              fit: BoxFit.contain,
-            ),
-          ),
-          Text(
-            '${forecast.temperature.round()}°',
-            style: GoogleFonts.plusJakartaSans(
-              color: Colors.white,
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              shadows: _shadow,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -511,54 +325,47 @@ class _DailyForecastRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dayName =
-        DateFormat('EEE', 'de_DE').format(forecast.date).toUpperCase();
+    final dayName = DateFormat('EEE', 'de_DE').format(forecast.date).toUpperCase();
     final range = rangeMax - rangeMin;
-    final barStart =
-        range == 0 ? 0.0 : (forecast.minTemp - rangeMin) / range;
-    final barWidth =
-        range == 0 ? 1.0 : (forecast.maxTemp - forecast.minTemp) / range;
+    final barStart = range == 0 ? 0.0 : (forecast.minTemp - rangeMin) / range;
+    final barWidth = range == 0 ? 1.0 : (forecast.maxTemp - forecast.minTemp) / range;
 
     return Row(
       children: [
-        // Tag-Name
         SizedBox(
-          width: 38,
+          width: 56,
           child: Text(
             dayName,
             style: GoogleFonts.plusJakartaSans(
               color: Colors.white,
-              fontSize: 14,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        const SizedBox(width: 4),
-        // Wetter-Icon
+        const SizedBox(width: 8),
         SizedBox(
-          width: 28,
-          height: 28,
+          width: 42,
+          height: 42,
           child: Lottie.asset(
             _getWmoLottie(forecast.weatherCode, true),
             fit: BoxFit.contain,
           ),
         ),
-        const SizedBox(width: 8),
-        // Min-Temp
+        const SizedBox(width: 12),
         SizedBox(
-          width: 34,
+          width: 44,
           child: Text(
             '${forecast.minTemp.round()}°',
             textAlign: TextAlign.right,
             style: GoogleFonts.plusJakartaSans(
               color: Colors.lightBlueAccent,
-              fontSize: 14,
+              fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
-        const SizedBox(width: 8),
-        // Temperatur-Balken
+        const SizedBox(width: 12),
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -566,22 +373,22 @@ class _DailyForecastRow extends StatelessWidget {
                 alignment: Alignment.centerLeft,
                 children: [
                   Container(
-                    height: 8,
+                    height: 12,
                     decoration: BoxDecoration(
                       color: Colors.white12,
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(6),
                     ),
                   ),
                   Positioned(
                     left: constraints.maxWidth * barStart,
                     width: constraints.maxWidth * barWidth.clamp(0.05, 1.0),
                     child: Container(
-                      height: 8,
+                      height: 12,
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [Colors.lightBlueAccent, Colors.orangeAccent],
                         ),
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: BorderRadius.circular(6),
                       ),
                     ),
                   ),
@@ -590,15 +397,14 @@ class _DailyForecastRow extends StatelessWidget {
             },
           ),
         ),
-        const SizedBox(width: 8),
-        // Max-Temp
+        const SizedBox(width: 12),
         SizedBox(
-          width: 34,
+          width: 44,
           child: Text(
             '${forecast.maxTemp.round()}°',
             style: GoogleFonts.plusJakartaSans(
               color: Colors.orangeAccent,
-              fontSize: 14,
+              fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -607,10 +413,6 @@ class _DailyForecastRow extends StatelessWidget {
     );
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// SHARED HELPERS
-// ─────────────────────────────────────────────────────────────────────────────
 
 final _shadow = [
   const Shadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2)),
